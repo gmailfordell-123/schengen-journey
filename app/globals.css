@@ -1,0 +1,437 @@
+@import "tailwindcss";
+
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  SCHENGEN JOURNEY  —  PREMIUM DESIGN SYSTEM
+ *  Visa consultancy aesthetic: deep navy · royal blue · soft white · gold accent
+ *  Inter type · Apple-quality hierarchy · soft professional shadows
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+  /* ── Real font stacks (from next/font) ────────────────────────────────
+     Use --app-sans / --app-display directly in CSS; Tailwind v4 @theme
+     doesn't emit custom font vars as real CSS properties.
+       --app-sans    = Inter   → body, subheadings, UI labels
+       --app-display = Manrope → display headings (H1–H3)                 */
+  --app-sans: var(--ff-inter, -apple-system), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Helvetica, Arial, sans-serif;
+  --app-display: var(--ff-manrope, var(--ff-inter, -apple-system)), -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* ── Navy palette ───────────────────────────────────────────────────── */
+  --navy-950: #040c1a;
+  --navy-900: #081428;
+  --navy-800: #0e1f42;
+  --navy-700: #162d5e;
+  --navy-600: #1e3a8a;
+  --navy-500: #2952b3;
+  --navy-400: #4070cc;
+  --navy-200: #93b4e8;
+  --navy-100: #d0e0f5;
+  --navy-50:  #edf4fd;
+
+  /* ── Gold accent (used sparingly — badges, highlights, CTAs) ─────────── */
+  --gold-500: #c9a84c;
+  --gold-400: #d4b86a;
+  --gold-100: #faf5e4;
+
+  /* ── Page surfaces ───────────────────────────────────────────────────── */
+  --bg:        #ffffff;
+  --bg-subtle: #f7f9fc;
+  --bg-dark:   var(--navy-900);
+
+  /* ── Ink / text ─────────────────────────────────────────────────────── */
+  --ink:       #0a1628;   /* headings on light  */
+  --ink-muted: #4a5568;   /* body paragraphs    */
+  --ink-light: #718096;   /* captions, labels   */
+  --ink-white: #f0f4ff;   /* text on dark       */
+
+  /* ── Borders ─────────────────────────────────────────────────────────── */
+  --border:       rgba(0, 0, 0, 0.08);
+  --border-navy:  rgba(255, 255, 255, 0.10);
+
+  /* ── Shadows ─────────────────────────────────────────────────────────── */
+  --shadow-xs:  0 1px 2px rgba(8, 20, 40, 0.06);
+  --shadow-sm:  0 1px 3px rgba(8, 20, 40, 0.06), 0 4px 12px -4px rgba(8, 20, 40, 0.08);
+  --shadow-md:  0 4px 16px -4px rgba(8, 20, 40, 0.12), 0 1px 3px rgba(8, 20, 40, 0.06);
+  --shadow-lg:  0 12px 32px -8px rgba(8, 20, 40, 0.18);
+
+  /* Legacy compat */
+  --background:    var(--bg);
+  --foreground:    var(--ink);
+  --border-soft:   var(--border);
+  --text-strong:   var(--ink);
+  --text-base:     var(--ink-muted);
+  --text-muted:    var(--ink-light);
+  --surface:       var(--bg);
+  --surface-muted: var(--bg-subtle);
+  --accent:        var(--navy-600);
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+
+  --font-sans:    var(--app-sans);
+  --font-display: var(--app-display);
+  --font-manrope: var(--app-display);
+  --font-mono:    var(--ff-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Tame global font-bold → semibold (600) everywhere */
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     600;
+
+  /* ── Brand = navy ────────────────────────────────────────────────────── */
+  --color-brand-50:  var(--navy-50);
+  --color-brand-100: var(--navy-100);
+  --color-brand-200: var(--navy-200);
+  --color-brand-400: var(--navy-400);
+  --color-brand-500: var(--navy-500);
+  --color-brand-600: var(--navy-600);
+  --color-brand-700: var(--navy-700);
+  --color-brand-800: var(--navy-800);
+  --color-brand-900: var(--navy-900);
+
+  /* Gold tokens */
+  --color-gold-100: var(--gold-100);
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+
+  /* Surface tokens */
+  --color-surface:       var(--bg);
+  --color-surface-muted: var(--bg-subtle);
+  --color-ink:           var(--ink);
+  --color-ink-muted:     var(--ink-muted);
+  --color-ink-light:     var(--ink-light);
+
+  /* Shadow tokens */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+}
+
+body {
+  /* Premium deep-navy base so no raw white is ever behind the page.
+     Marketing sections paint their own (lighter) surfaces on top; app
+     pages use <PremiumPageShell> for a richer navy gradient. */
+  background-color: var(--navy-950);
+  color: var(--ink-muted);
+  font-family: var(--app-sans);
+}
+
+@layer base {
+  body {
+    /* Normal paragraph: Inter 400, 16–18px, line-height 1.7 */
+    font-family: var(--app-sans);
+    font-weight: 400;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.7;
+    letter-spacing: -0.003em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Display headings: Manrope. The precise size scale lives in the
+     .text-h1/.text-h2/.text-h3 utilities (applied to display headings) so
+     that small card/section headings with their own size class are never
+     ballooned. Base only sets family, weight and rhythm. */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--app-display);
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  h1 { font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+  h3, h4 { letter-spacing: -0.015em; }
+  p { line-height: 1.7; }
+}
+
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  COMPONENT UTILITIES
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+@layer components {
+  /* ── Buttons (round) ────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    font-family: var(--app-sans);
+    line-height: 1;
+    transition: background-color 0.18s ease, transform 0.15s ease,
+      box-shadow 0.18s ease, color 0.18s ease;
+  }
+  .btn:active { transform: translateY(0.5px); }
+
+  .btn-navy {
+    background: var(--navy-600);
+    color: #fff;
+    padding: 0.8rem 1.75rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-navy:hover {
+    background: var(--navy-700);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-gold {
+    background: var(--gold-500);
+    color: var(--navy-900);
+    padding: 0.8rem 1.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(201,168,76,0.35);
+  }
+  .btn-gold:hover {
+    background: var(--gold-400);
+    box-shadow: 0 4px 16px rgba(201,168,76,0.45);
+  }
+
+  .btn-outline-navy {
+    background: transparent;
+    color: var(--navy-600);
+    padding: 0.75rem 1.75rem;
+    border: 1.5px solid var(--navy-600);
+  }
+  .btn-outline-navy:hover {
+    background: var(--navy-50);
+  }
+
+  .btn-outline-white {
+    background: transparent;
+    color: #fff;
+    padding: 0.75rem 1.75rem;
+    border: 1.5px solid rgba(255,255,255,0.5);
+  }
+  .btn-outline-white:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.8);
+  }
+
+  /* ── Cards ──────────────────────────────────────────────────────────── */
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  /* Optional opt-in hover lift for static (non-motion) cards. */
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-dark {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid var(--border-navy);
+    border-radius: 1rem;
+    box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5);
+    transition: transform 0.25s ease, box-shadow 0.25s ease,
+      border-color 0.25s ease, background 0.25s ease;
+  }
+
+  /* ── Section rhythm ─────────────────────────────────────────────────────
+     "Light" surfaces are no longer flat white — they carry a soft blue-grey
+     gradient, a faint dotted grid and a radial glow for premium depth.    */
+  .section-light {
+    background-color: #eef3fb;
+    background-image:
+      radial-gradient(rgba(14,31,66,0.045) 1px, transparent 1px),
+      radial-gradient(900px 480px at 85% -8%, rgba(41,82,179,0.08), transparent 60%),
+      linear-gradient(180deg, #f7faff 0%, #eef3fb 100%);
+    background-size: 26px 26px, 100% 100%, 100% 100%;
+    background-repeat: repeat, no-repeat, no-repeat;
+  }
+  .section-subtle {
+    background-color: #e9eff8;
+    background-image:
+      radial-gradient(rgba(14,31,66,0.05) 1px, transparent 1px),
+      radial-gradient(820px 460px at 12% 0%, rgba(30,58,138,0.09), transparent 58%),
+      linear-gradient(180deg, #eef3fb 0%, #e7eef8 100%);
+    background-size: 26px 26px, 100% 100%, 100% 100%;
+    background-repeat: repeat, no-repeat, no-repeat;
+  }
+  .section-dark {
+    background-color: var(--navy-900);
+    background-image:
+      radial-gradient(900px 500px at 80% -10%, rgba(41,82,179,0.18), transparent 60%),
+      linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 100%);
+    color: var(--ink-white);
+  }
+  .section-navy {
+    background-color: var(--navy-800);
+    background-image:
+      radial-gradient(820px 460px at 15% 0%, rgba(41,82,179,0.22), transparent 58%),
+      linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%);
+    color: var(--ink-white);
+  }
+
+  .section-pad { padding-top: 6rem; padding-bottom: 6rem; }
+  @media (min-width: 1024px) {
+    .section-pad { padding-top: 7.5rem; padding-bottom: 7.5rem; }
+  }
+
+  /* ── Typography scale (semantic utilities) ──────────────────────────────
+     H1/H2/H3 = Manrope · subheading/body/label = Inter.                   */
+  .text-h1 {
+    font-family: var(--app-display);
+    font-weight: 700;
+    font-size: clamp(3.5rem, 2.6rem + 3.6vw, 4.5rem); /* 56 → 72px */
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .text-h2 {
+    font-family: var(--app-display);
+    font-weight: 600;
+    font-size: clamp(2.5rem, 2rem + 2.1vw, 3.25rem); /* 40 → 52px */
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .text-h3 {
+    font-family: var(--app-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem); /* 24 → 32px */
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .text-subhead {
+    font-family: var(--app-sans);
+    font-weight: 400;
+    font-size: clamp(1.125rem, 1rem + 0.55vw, 1.375rem); /* 18 → 22px */
+    line-height: 1.6;
+  }
+  .text-body {
+    font-family: var(--app-sans);
+    font-weight: 400;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* 16 → 18px */
+    line-height: 1.7;
+  }
+  .text-label {
+    font-family: var(--app-sans);
+    font-weight: 600;
+    font-size: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem); /* 12 → 13px */
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* ── Eyebrow labels (small uppercase label, Inter 600, 0.12em) ────────── */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--app-sans);
+    font-size: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-500);
+  }
+  .eyebrow::before, .eyebrow::after {
+    content: "";
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: var(--gold-500);
+    opacity: 0.6;
+  }
+
+  .eyebrow-navy {
+    color: var(--navy-600);
+  }
+  .eyebrow-navy::before, .eyebrow-navy::after {
+    background: var(--navy-400);
+  }
+
+  /* ── Gold accent text ────────────────────────────────────────────────── */
+  .text-gold { color: var(--gold-500); }
+  .text-navy { color: var(--navy-600); }
+
+  /* ── Legacy class aliases so old markup keeps working ───────────────── */
+  .glass-card        { background: var(--bg); border: 1px solid var(--border); border-radius: 1rem; }
+  .glass-card-strong { background: var(--bg); border: 1px solid var(--border); border-radius: 1rem; box-shadow: var(--shadow-md); }
+  .gradient-text     { color: var(--navy-600); }
+  .gradient-bg       { background: var(--navy-600); }
+  .btn-gradient      { background: var(--navy-600); color: #fff; border-radius: 9999px; }
+  .gradient-border   { border: 1px solid var(--border); }
+  .glow              { box-shadow: var(--shadow-md); }
+  .app-dark          { background: var(--bg); color: var(--ink-muted); }
+  .accent-wash       { background: var(--bg-subtle); }
+
+  /* ── Premium navy page background (used by PremiumPageShell + app pages) ── */
+  .premium-bg {
+    position: relative;
+    background-color: var(--navy-950);
+    background-image:
+      radial-gradient(1100px 620px at 82% -8%, rgba(41,82,179,0.20), transparent 60%),
+      radial-gradient(900px 560px at 8% 108%, rgba(201,168,76,0.07), transparent 60%),
+      linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 48%, var(--navy-800) 100%);
+  }
+  /* Subtle grid overlay layer — sits behind content, never intercepts clicks. */
+  .premium-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(120% 90% at 50% 0%, #000 35%, transparent 85%);
+            mask-image: radial-gradient(120% 90% at 50% 0%, #000 35%, transparent 85%);
+  }
+}
+
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  MOTION  —  lightweight entrance animations (Framer handles the rest)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+@keyframes sj-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sj-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-page-in {
+  animation: sj-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Staggered card reveal — apply to a grid/stack; children fade up in sequence. */
+.reveal-stagger > * {
+  animation: sj-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.reveal-stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.reveal-stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.reveal-stagger > *:nth-child(3) { animation-delay: 0.16s; }
+.reveal-stagger > *:nth-child(4) { animation-delay: 0.22s; }
+.reveal-stagger > *:nth-child(5) { animation-delay: 0.28s; }
+.reveal-stagger > *:nth-child(6) { animation-delay: 0.34s; }
+
+/* ── Accessibility: honour the user's reduced-motion preference ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
