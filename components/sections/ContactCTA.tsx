@@ -10,7 +10,7 @@ export function ContactCTA() {
       <Container>
         <motion.div
           data-aos="fade-up"
-          className="relative overflow-hidden rounded-2xl px-8 py-16 text-center sm:px-16"
+          className="relative overflow-hidden rounded-3xl px-8 py-20 text-center sm:px-16 lg:py-24"
           style={{
             background: `linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%)`,
           }}

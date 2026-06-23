@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { faqs } from "@/lib/home-content";
@@ -45,16 +46,14 @@ export function FAQ() {
                     {faq.question}
                   </span>
                   <motion.div
-                    animate={{ rotate: isOpen ? 45 : 0 }}
+                    animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center text-sm"
                     style={{
-                      background: isOpen ? "var(--navy-600)" : "var(--bg-subtle)",
-                      color: isOpen ? "#fff" : "var(--ink-light)",
-                      border: "1px solid var(--border)",
+                      color: isOpen ? "var(--navy-600)" : "var(--ink-light)",
                     }}
                   >
-                    +
+                    <ChevronDown size={18} strokeWidth={2} />
                   </motion.div>
                 </button>
                 <AnimatePresence initial={false}>

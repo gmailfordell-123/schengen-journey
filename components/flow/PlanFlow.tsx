@@ -32,7 +32,10 @@ export function PlanFlow() {
   const [destinations, setDestinations] = useState<string[]>([]);
 
   const cities = origin ? citiesByOrigin[origin] : [];
-  const availableDestinations = city ? destinationsByCity[city] ?? [] : [];
+  const availableDestinations = useMemo(
+    () => (city ? destinationsByCity[city] ?? [] : []),
+    [city]
+  );
 
   const originData = getOrigin(origin);
   const cityData = getCity(origin, city);

@@ -10,15 +10,12 @@ type Region = "uk" | "ireland";
 
 const destinations: Record<Region, string[]> = {
   uk: [
-    "France", "Germany", "Spain", "Italy", "Netherlands", "Belgium", "Austria",
-    "Portugal", "Switzerland", "Greece", "Sweden", "Norway", "Denmark", "Poland",
-    "Czech Republic", "Hungary", "Slovakia", "Slovenia", "Croatia", "Finland",
-    "Luxembourg", "Malta", "Iceland", "Liechtenstein",
+    "France", "Netherlands", "Italy", "Greece", "Hungary", "Austria",
+    "Switzerland", "Denmark", "Iceland", "Finland",
   ],
   ireland: [
-    "France", "Germany", "Spain", "Italy", "Netherlands", "Belgium", "Austria",
-    "Portugal", "Greece", "Sweden", "Switzerland", "Denmark", "Poland",
-    "Czech Republic", "Hungary", "Finland", "Norway", "Malta",
+    "Netherlands", "Austria", "Italy", "Switzerland", "Belgium", "Croatia",
+    "Denmark", "Hungary", "Finland", "Slovenia", "Norway", "Sweden", "Iceland",
   ],
 };
 
@@ -30,8 +27,8 @@ export function Destinations() {
       <Container>
         <SectionHeading
           eyebrow="Supported Destinations"
-          title="All 27 Schengen states covered"
-          subtitle="Whether you are travelling for tourism, business, family visits, or study, we support Schengen visa applications to every member state."
+          title="Premium Schengen destinations"
+          subtitle="We specialize in streamlined visa applications to top European destinations. Select your origin country to see the destinations we support."
           data-aos="fade-up"
         />
 
@@ -75,25 +72,28 @@ export function Destinations() {
         <AnimatePresence mode="wait">
           <motion.div
             key={region}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-            className="mt-10 flex flex-wrap justify-center gap-3"
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.3 }}
+            className="mt-14 flex flex-wrap justify-center gap-3"
           >
-            {destinations[region].map((name) => (
-              <div
+            {destinations[region].map((name, idx) => (
+              <motion.div
                 key={name}
-                className="flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-medium transition-shadow duration-200 hover:shadow-[var(--shadow-sm)]"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.04, duration: 0.2 }}
+                className="flex items-center gap-2.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
                 style={{
                   background: "var(--bg)",
                   border: "1px solid var(--border)",
                   color: "var(--ink)",
                 }}
               >
-                <MapPin size={15} style={{ color: "var(--navy-500)" }} />
-                {name}
-              </div>
+                <MapPin size={16} style={{ color: "var(--navy-600)" }} />
+                <span>{name}</span>
+              </motion.div>
             ))}
           </motion.div>
         </AnimatePresence>

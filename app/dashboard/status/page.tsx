@@ -102,6 +102,9 @@ export default function StatusPage() {
   }
 
   useEffect(() => {
+    // load() is async — state is set after the await, so there is no
+    // synchronous render cascade here (it's an initial data fetch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
 
     const supabase = createBrowserClient<Database>(
@@ -116,7 +119,6 @@ export default function StatusPage() {
       .subscribe();
 
     return () => { channel.unsubscribe(); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const selected = appointments.find((a) => a.id === selectedId) ?? null;

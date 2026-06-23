@@ -1,5 +1,9 @@
 "use server";
 
+/* Supabase's query builder loses its generic types on deep relational
+   selects, so these server actions cast through `any` deliberately. */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { createClient } from "@/lib/supabase/server";
 import { requireAuth } from "@/lib/auth";
 import type { AppointmentStatus } from "@/lib/supabase/types";
@@ -33,7 +37,6 @@ export async function getUserAppointmentsWithHistory(): Promise<TrackedAppointme
   const profile = await requireAuth();
   const supabase = await createClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from("appointments")
     .select(`

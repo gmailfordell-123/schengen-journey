@@ -1,32 +1,23 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Container } from "@/components/ui/Container";
+import { ArrowRight } from "lucide-react";
 
-/* ─── Flag SVG components ─────────────────────────────────────────────────── */
+/* ─── Inline flag SVGs (no emoji) ────────────────────────────────────────── */
 
 function UKFlag() {
   return (
-    <svg
-      viewBox="0 0 60 40"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ display: "block", width: "100%", height: "100%" }}
-      aria-label="United Kingdom flag"
-    >
-      {/* Blue field */}
+    <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"
+      style={{ display: "block", width: "100%", height: "100%" }}>
       <rect width="60" height="40" fill="#012169" />
-      {/* St Andrew's white diagonals */}
       <line x1="0" y1="0" x2="60" y2="40" stroke="white" strokeWidth="10" />
       <line x1="60" y1="0" x2="0" y2="40" stroke="white" strokeWidth="10" />
-      {/* St Patrick's red counter-diagonals */}
       <line x1="0" y1="0" x2="60" y2="40" stroke="#C8102E" strokeWidth="5" />
       <line x1="60" y1="0" x2="0" y2="40" stroke="#C8102E" strokeWidth="5" />
-      {/* St George's white cross arms */}
       <rect x="24" y="0" width="12" height="40" fill="white" />
       <rect x="0" y="14" width="60" height="12" fill="white" />
-      {/* St George's red cross arms */}
       <rect x="26" y="0" width="8" height="40" fill="#C8102E" />
       <rect x="0" y="16" width="60" height="8" fill="#C8102E" />
     </svg>
@@ -35,12 +26,8 @@ function UKFlag() {
 
 function IrelandFlag() {
   return (
-    <svg
-      viewBox="0 0 60 40"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ display: "block", width: "100%", height: "100%" }}
-      aria-label="Ireland flag"
-    >
+    <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"
+      style={{ display: "block", width: "100%", height: "100%" }}>
       <rect x="0"  y="0" width="20" height="40" fill="#169B62" />
       <rect x="20" y="0" width="20" height="40" fill="#F4F5F0" />
       <rect x="40" y="0" width="20" height="40" fill="#FF883E" />
@@ -48,324 +35,177 @@ function IrelandFlag() {
   );
 }
 
-/* ─── Card data ───────────────────────────────────────────────────────────── */
+/* ─── Card definitions ────────────────────────────────────────────────────── */
 
 const CARDS = [
   {
     id: "uk",
+    href: "/book?origin=uk",
+    label: "UNITED KINGDOM",
+    heading: "United Kingdom Applications",
+    subheading:
+      "Schengen visa appointment and document support for UK residents.",
+    cta: "Continue from United Kingdom",
+    centres: ["London", "Manchester", "Birmingham", "Edinburgh"],
     Flag: UKFlag,
-    name: "United Kingdom",
-    tagline: "Apply through our supported UK visa centres.",
-    centres: ["London", "Birmingham", "Manchester", "Edinburgh"],
-    href: "/book",
-    cta: "Select United Kingdom",
+    // Big Ben / Houses of Parliament at dusk — Unsplash
+    image:
+      "https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=1600&q=85&fit=crop",
+    ctaColor: "#e07c18",
   },
   {
-    id: "ie",
-    Flag: IrelandFlag,
-    name: "Ireland",
-    tagline: "Apply through our supported Ireland visa centre.",
+    id: "ireland",
+    href: "/book?origin=ireland",
+    label: "IRELAND",
+    heading: "Ireland Applications",
+    subheading:
+      "Schengen visa appointment and document support for Ireland residents.",
+    cta: "Continue from Ireland",
     centres: ["Dublin"],
-    href: "/book",
-    cta: "Select Ireland",
+    Flag: IrelandFlag,
+    // Cliffs of Moher, Ireland — Unsplash
+    image:
+      "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=1600&q=85&fit=crop",
+    ctaColor: "#1fa85a",
   },
 ] as const;
 
-const TRUST_ITEMS = [
-  "Specialised for UK and Ireland residents",
-  "Clear centre selection guidance",
-  "Destination-specific document checklists",
-  "Package-based application support",
-];
-
-/* ─── Animation variants ──────────────────────────────────────────────────── */
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 22 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring" as const, stiffness: 80, damping: 18 },
-  },
-} as const;
-
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
-} as const;
-
-/* ─── Component ───────────────────────────────────────────────────────────── */
+/* ─── Section ─────────────────────────────────────────────────────────────── */
 
 export function CountrySelector() {
   return (
-    <section
-      id="countries"
-      className="relative overflow-hidden"
-      style={{ paddingTop: "6rem", paddingBottom: "7rem" }}
-    >
-      {/* ── Layered background ────────────────────────────────────────── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(180deg, #eef4ff 0%, #f2f6fc 40%, #f7f9fc 75%, #ffffff 100%)",
-        }}
-      />
-      {/* Dot grid texture */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(14,31,66,0.055) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-      />
-      {/* Soft radial glow — top right */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "-140px",
-          right: "-100px",
-          width: "500px",
-          height: "500px",
-          background:
-            "radial-gradient(circle, rgba(41,82,179,0.08) 0%, transparent 70%)",
-          borderRadius: "50%",
-        }}
-      />
-
-      <Container className="relative">
-        {/* ── Heading block ─────────────────────────────────────────────── */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-          className="text-center max-w-2xl mx-auto"
-        >
-          {/* Eyebrow label */}
+    <section id="countries" className="relative overflow-hidden section-pad section-subtle">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        {CARDS.map((card, i) => (
           <motion.div
-            variants={fadeUp}
-            className="flex items-center justify-center gap-3 mb-5"
+            key={card.id}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="group relative overflow-hidden"
+            style={{ minHeight: "580px" }}
           >
-            <span
-              className="h-px w-8 rounded shrink-0"
-              style={{ background: "var(--gold-500)" }}
+            {/* ── Photo background ── */}
+            <Image
+              src={card.image}
+              alt={`${card.label} background`}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+              priority={i === 0}
             />
-            <span
-              className="text-[11px] font-semibold uppercase tracking-[0.16em]"
-              style={{ color: "var(--gold-500)" }}
-            >
-              Where Are You Applying From
-            </span>
-            <span
-              className="h-px w-8 rounded shrink-0"
-              style={{ background: "var(--gold-500)" }}
-            />
-          </motion.div>
 
-          {/* Main heading */}
-          <motion.h2
-            variants={fadeUp}
-            className="text-h2"
-            style={{ color: "var(--ink)" }}
-          >
-            Choose your application location
-          </motion.h2>
-
-          {/* Subheading */}
-          <motion.p
-            variants={fadeUp}
-            className="text-subhead mt-4"
-            style={{ color: "var(--ink-muted)" }}
-          >
-            Schengen Journey supports visa applicants applying from the United
-            Kingdom and Ireland. Select your location to view supported centres,
-            destinations, and service packages.
-          </motion.p>
-        </motion.div>
-
-        {/* ── Country cards ─────────────────────────────────────────────── */}
-        <div className="mt-14 grid gap-8 sm:grid-cols-2 max-w-4xl mx-auto">
-          {CARDS.map((card, i) => (
-            <motion.div
-              key={card.id}
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{
-                delay: i * 0.13,
-                type: "spring" as const,
-                stiffness: 70,
-                damping: 16,
+            {/* ── Gradient overlay — darkens bottom for text readability ── */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,0.90) 100%)",
               }}
-              whileHover={{ y: -7 }}
+            />
+
+            {/* ── Hover dim ── */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              style={{ background: "rgba(0,0,0,0.12)" }}
+            />
+
+            {/* ── Vertical divider on desktop ── */}
+            {i === 0 && (
+              <div
+                className="absolute right-0 top-0 bottom-0 w-px hidden lg:block pointer-events-none"
+                style={{ background: "rgba(255,255,255,0.12)" }}
+              />
+            )}
+
+            {/* ── Content ── */}
+            <Link
+              href={card.href}
+              className="absolute inset-0 z-10 flex flex-col justify-between p-9 lg:p-12"
+              aria-label={card.cta}
             >
-              <Link
-                href={card.href}
-                className="cs-card group flex flex-col h-full rounded-2xl"
-                style={{
-                  background: "#ffffff",
-                  border: "1px solid rgba(0,0,0,0.08)",
-                  boxShadow:
-                    "0 2px 8px rgba(8,20,40,0.06), 0 10px 28px -8px rgba(8,20,40,0.10)",
-                  overflow: "hidden",
-                  transition: "box-shadow 0.3s ease",
-                }}
-              >
-                {/* Gold accent bar */}
+              {/* Top: flag badge + label */}
+              <div>
                 <div
-                  className="h-[3px] w-full shrink-0"
+                  className="inline-flex items-center gap-2.5 rounded-full px-3.5 py-2"
                   style={{
-                    background:
-                      "linear-gradient(90deg, var(--gold-500), var(--gold-400))",
+                    background: "rgba(0,0,0,0.52)",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255,255,255,0.18)",
                   }}
-                />
-
-                <div className="flex flex-col flex-1 p-8">
-
-                  {/* Flag in styled container */}
-                  <div className="mb-7">
-                    <div
-                      style={{
-                        width: "90px",
-                        height: "60px",
-                        borderRadius: "8px",
-                        overflow: "hidden",
-                        boxShadow:
-                          "0 2px 10px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.09)",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <card.Flag />
-                    </div>
-                  </div>
-
-                  {/* Country name */}
-                  <h3
-                    className="text-h3"
-                    style={{ color: "var(--ink)" }}
-                  >
-                    {card.name}
-                  </h3>
-                  <p
-                    className="mt-2 text-sm leading-relaxed"
-                    style={{ color: "var(--ink-muted)" }}
-                  >
-                    {card.tagline}
-                  </p>
-
-                  {/* Divider */}
+                >
                   <div
-                    className="my-6 h-px"
-                    style={{ background: "rgba(0,0,0,0.07)" }}
-                  />
-
-                  {/* Supported centres */}
-                  <div className="flex-1">
-                    <p
-                      className="mb-4 text-[11px] font-semibold uppercase tracking-[0.13em]"
-                      style={{ color: "var(--ink-light)" }}
-                    >
-                      Supported Centres
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {card.centres.map((city) => (
-                        <span
-                          key={city}
-                          className="rounded-full px-3.5 py-1.5 text-xs font-medium"
-                          style={{
-                            background: "var(--navy-50)",
-                            color: "var(--navy-700)",
-                            border: "1px solid var(--navy-100)",
-                          }}
-                        >
-                          {city}
-                        </span>
-                      ))}
-                    </div>
+                    style={{
+                      width: "22px",
+                      height: "15px",
+                      borderRadius: "3px",
+                      overflow: "hidden",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <card.Flag />
                   </div>
+                  <span
+                    className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white"
+                  >
+                    {card.label}
+                  </span>
+                </div>
+              </div>
 
-                  {/* CTA button */}
-                  <div className="mt-8">
-                    <div
-                      className="cs-btn flex items-center justify-center gap-2.5 py-3.5 text-sm font-semibold text-white"
+              {/* Bottom: heading, sub, centres, CTA */}
+              <div>
+                <h2 className="text-h2 text-white leading-tight drop-shadow-lg">
+                  {card.heading}
+                </h2>
+
+                <p
+                  className="mt-4 text-subhead max-w-sm drop-shadow"
+                  style={{ color: "rgba(255,255,255,0.82)" }}
+                >
+                  {card.subheading}
+                </p>
+
+                {/* Supported centre pills */}
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {card.centres.map((c) => (
+                    <span
+                      key={c}
+                      className="rounded-full px-3.5 py-1.5 text-xs font-medium"
                       style={{
-                        background: "var(--navy-700)",
-                        borderRadius: "10px",
-                        transition: "background 0.18s ease",
+                        background: "rgba(0,0,0,0.45)",
+                        color: "rgba(255,255,255,0.92)",
+                        border: "1px solid rgba(255,255,255,0.28)",
+                        backdropFilter: "blur(6px)",
+                        WebkitBackdropFilter: "blur(6px)",
                       }}
                     >
-                      {card.cta}
-                      <ArrowRight
-                        size={15}
-                        strokeWidth={2.5}
-                        className="group-hover:translate-x-1 transition-transform duration-200"
-                      />
-                    </div>
+                      {c}
+                    </span>
+                  ))}
+                </div>
+
+                {/* CTA button */}
+                <div className="mt-8">
+                  <div
+                    className="inline-flex items-center gap-3 rounded-xl px-7 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 group-hover:brightness-110"
+                    style={{ background: card.ctaColor }}
+                  >
+                    {card.cta}
+                    <ArrowRight
+                      size={16}
+                      strokeWidth={2.5}
+                      className="transition-transform duration-300 group-hover:translate-x-1.5"
+                    />
                   </div>
                 </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* ── Trust strip ───────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ delay: 0.3, duration: 0.45 }}
-          className="mt-12 max-w-4xl mx-auto"
-        >
-          {/* Rule with label */}
-          <div className="flex items-center gap-5 mb-7">
-            <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
-            <span
-              className="text-[11px] font-medium tracking-wider shrink-0"
-              style={{ color: "var(--ink-light)" }}
-            >
-              WHAT WE PROVIDE
-            </span>
-            <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {TRUST_ITEMS.map((item) => (
-              <div
-                key={item}
-                className="flex items-start gap-2.5 rounded-xl px-4 py-3.5"
-                style={{
-                  background: "rgba(255,255,255,0.85)",
-                  border: "1px solid rgba(0,0,0,0.07)",
-                }}
-              >
-                <CheckCircle2
-                  size={14}
-                  strokeWidth={2.5}
-                  className="mt-0.5 shrink-0"
-                  style={{ color: "var(--navy-600)" }}
-                />
-                <span
-                  className="text-xs leading-snug font-medium"
-                  style={{ color: "var(--ink-muted)" }}
-                >
-                  {item}
-                </span>
               </div>
-            ))}
-          </div>
-        </motion.div>
-      </Container>
-
-      <style>{`
-        .cs-card:hover {
-          box-shadow: 0 10px 36px rgba(8,20,40,0.15), 0 2px 8px rgba(8,20,40,0.06) !important;
-        }
-        .cs-card:hover .cs-btn {
-          background: var(--navy-800) !important;
-        }
-      `}</style>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
     </section>
   );
 }

@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 
 const checklist = [
   {

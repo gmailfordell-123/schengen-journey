@@ -50,8 +50,10 @@ export default function AdminAppointmentsPage() {
 
   const selected = appointments.find((a) => a.id === selectedId) ?? null;
 
-  // Keep notes draft in sync when selection changes
+  // Reset the editable notes draft whenever a different appointment is
+  // selected. This intentionally syncs local edit state to the selection.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNotesDraft(selected?.notes ?? "");
     setSaveMsg("");
   }, [selectedId, selected?.notes]);

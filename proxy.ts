@@ -1,6 +1,6 @@
 /**
- * Next.js middleware — refreshes the Supabase session on every request and
- * enforces route protection + role-based access control.
+ * Next.js proxy (formerly "middleware") — refreshes the Supabase session on
+ * every request and enforces route protection + role-based access control.
  *
  * Rules:
  *  /dashboard/*  → must be authenticated (any role)
@@ -16,7 +16,7 @@ const ADMIN_PREFIX     = "/admin";
 const DASHBOARD_PREFIX = "/dashboard";
 const AUTH_PAGES       = ["/login", "/register"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   // Anon client — used to refresh the session cookie

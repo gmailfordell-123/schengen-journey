@@ -867,7 +867,7 @@ export default function VisaInformationPage() {
                       <CheckItem>Single-trip Schengen travel insurance</CheckItem>
                       <CheckItem>Multi-trip annual policies (if covering Schengen)</CheckItem>
                       <CheckItem>Policies purchased through UK or Irish insurers</CheckItem>
-                      <CheckItem>Policies showing "Schengen Zone" as covered territory</CheckItem>
+                      <CheckItem>Policies showing &ldquo;Schengen Zone&rdquo; as covered territory</CheckItem>
                     </ul>
                   </div>
                   <div

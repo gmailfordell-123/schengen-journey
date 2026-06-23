@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -77,6 +78,114 @@ const STEPS = [
   "Review",
 ];
 
+// ─── Nationality dropdown component ────────────────────────────────────────────
+
+const NATIONALITIES = [
+  "Afghan",
+  "Algerian",
+  "Bangladeshi",
+  "Brazilian",
+  "Chinese",
+  "Egyptian",
+  "Emirati",
+  "Filipino",
+  "Ghanaian",
+  "Indian",
+  "Iranian",
+  "Iraqi",
+  "Jordanian",
+  "Kuwaiti",
+  "Lebanese",
+  "Mexican",
+  "Moroccan",
+  "Nepali",
+  "Nigerian",
+  "Pakistani",
+  "Qatari",
+  "Saudi Arabian",
+  "South African",
+  "Sri Lankan",
+  "Syrian",
+  "Turkish",
+  "Ukrainian",
+].sort();
+
+function NationalityDropdown({
+  value,
+  onChange,
+  error,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  error?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const filtered = NATIONALITIES.filter((n) =>
+    n.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="relative">
+      <motion.button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`w-full rounded-lg border px-3 py-2.5 text-sm text-left transition ${
+          error
+            ? "border-red-400 bg-red-50 text-red-700"
+            : "border-slate-300 bg-white text-slate-900"
+        }`}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
+      >
+        {value || "Select nationality…"}
+      </motion.button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-12 z-10 w-full rounded-lg border border-slate-200 bg-white shadow-lg"
+          >
+            <input
+              type="text"
+              placeholder="Search…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-t-lg border-b border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500"
+              autoFocus
+            />
+            <div className="max-h-48 overflow-y-auto">
+              {filtered.map((n) => (
+                <motion.button
+                  key={n}
+                  type="button"
+                  onClick={() => {
+                    onChange(n);
+                    setOpen(false);
+                    setSearch("");
+                  }}
+                  className={`w-full px-3 py-2 text-left text-sm transition ${
+                    value === n
+                      ? "bg-brand-50 text-brand-700 font-medium"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                  whileHover={{ paddingLeft: "1rem" }}
+                >
+                  {n}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ─── Field helpers ─────────────────────────────────────────────────────────────
 
 function Field({
@@ -97,7 +206,19 @@ function Field({
         {optional && <span className="ml-1 text-xs text-slate-400">(optional)</span>}
       </label>
       {children}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            className="text-xs text-red-500"
+          >
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -109,7 +230,7 @@ function Input(
   return (
     <input
       {...rest}
-      className={`rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 ${
+      className={`rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 focus:scale-105 ${
         error
           ? "border-red-400 bg-red-50 focus:ring-red-400"
           : "border-slate-300 bg-white focus:border-brand-500"
@@ -125,7 +246,7 @@ function Select(
   return (
     <select
       {...rest}
-      className={`rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 ${
+      className={`rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 focus:scale-105 ${
         error
           ? "border-red-400 bg-red-50 focus:ring-red-400"
           : "border-slate-300 bg-white focus:border-brand-500"
@@ -142,26 +263,48 @@ type Errors = Record<string, string>;
 
 function validateApplicants(applicants: Applicant[]): Errors {
   const e: Errors = {};
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   applicants.forEach((a, idx) => {
     const p = `applicant_${idx}`;
     if (!a.firstName.trim()) e[`${p}_firstName`] = "Required";
     if (!a.lastName.trim()) e[`${p}_lastName`] = "Required";
     if (!a.gender) e[`${p}_gender`] = "Required";
-    if (!a.dob) e[`${p}_dob`] = "Required";
+    if (!a.dob) {
+      e[`${p}_dob`] = "Required";
+    } else {
+      const dob = new Date(a.dob);
+      if (dob > today) e[`${p}_dob`] = "Cannot be in the future";
+    }
     if (!a.nationality.trim()) e[`${p}_nationality`] = "Required";
     if (!a.passportNo.trim()) e[`${p}_passportNo`] = "Required";
     if (!a.passportCountry.trim()) e[`${p}_passportCountry`] = "Required";
-    if (!a.passportIssue) e[`${p}_passportIssue`] = "Required";
-    if (!a.passportExpiry) e[`${p}_passportExpiry`] = "Required";
+    if (!a.passportIssue) {
+      e[`${p}_passportIssue`] = "Required";
+    }
+    if (!a.passportExpiry) {
+      e[`${p}_passportExpiry`] = "Required";
+    } else {
+      const expiry = new Date(a.passportExpiry);
+      if (expiry < today) e[`${p}_passportExpiry`] = "Passport has expired";
+    }
   });
   return e;
 }
 
 function validateContact(data: FormData): Errors {
   const e: Errors = {};
-  if (!data.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
-    e.email = "Valid email required";
-  if (!data.phone.trim()) e.phone = "Required";
+  if (!data.email.trim()) {
+    e.email = "Email required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    e.email = "Enter a valid email address";
+  }
+  if (!data.phone.trim()) {
+    e.phone = "Phone required";
+  } else if (!/^[\d\s\-\+\(\)]{7,}$/.test(data.phone)) {
+    e.phone = "Enter a valid phone number";
+  }
   if (!data.insurance) e.insurance = "Please choose an option";
   return e;
 }
@@ -201,6 +344,21 @@ function StepLocation({
   );
 }
 
+// ─── City landmark photos ──────────────────────────────────────────────────────
+
+const CITY_PHOTOS: Record<string, string> = {
+  london:
+    "https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=800&q=80&fit=crop",
+  manchester:
+    "https://images.unsplash.com/photo-1440870322374-5ca64e56ecba?w=800&q=80&fit=crop",
+  birmingham:
+    "https://images.unsplash.com/photo-1670263965983-b09362d6c114?w=800&q=80&fit=crop",
+  edinburgh:
+    "https://images.unsplash.com/photo-1751922090004-6386496669c8?w=800&q=80&fit=crop",
+  dublin:
+    "https://images.unsplash.com/photo-1554191765-016992e268ee?w=800&q=80&fit=crop",
+};
+
 // ─── Step: Centre ──────────────────────────────────────────────────────────────
 
 function StepCentre({
@@ -227,16 +385,88 @@ function StepCentre({
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        {cities.map((c) => (
-          <SelectableCard
-            key={c.id}
-            icon={<MapPin size={22} />}
-            title={c.name}
-            selected={selected === c.id}
-            onClick={() => onSelect(c.id)}
-          />
-        ))}
+        {cities.map((c) => {
+          const isSel = selected === c.id;
+          const photo = CITY_PHOTOS[c.id];
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => onSelect(c.id)}
+              aria-pressed={isSel}
+              className="group relative overflow-hidden rounded-2xl transition-all"
+              style={{
+                height: "180px",
+                border: isSel
+                  ? "3px solid #2563eb"
+                  : "2px solid rgba(0,0,0,0.08)",
+                boxShadow: isSel
+                  ? "0 0 0 3px rgba(37,99,235,0.2)"
+                  : "0 4px 16px rgba(0,0,0,0.08)",
+              }}
+            >
+              {/* Photo background */}
+              {photo && (
+                <Image
+                  src={photo}
+                  alt={c.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              )}
+
+              {/* Gradient overlay */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.12) 100%)",
+                }}
+              />
+
+              {/* Content */}
+              <div className="absolute inset-0 flex items-end justify-between p-5">
+                <div>
+                  <p className="text-lg font-bold text-white drop-shadow-lg">
+                    {c.name}
+                  </p>
+                  <p className="text-xs text-white/70 mt-0.5">Visa Application Centre</p>
+                </div>
+                {isSel && (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg">
+                    <Check size={16} strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
+    </div>
+  );
+}
+
+// ─── Real flag photos from flagcdn.com ──────────────────────────────────────────
+
+function CountryFlag({ code, name }: { code: string; name: string }) {
+  return (
+    <div style={{
+      width: "32px",
+      height: "24px",
+      borderRadius: "4px",
+      overflow: "hidden",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+      position: "relative",
+      flexShrink: 0,
+    }}>
+      <Image
+        src={`https://flagcdn.com/w80/${code}.png`}
+        alt={`${name} flag`}
+        width={80}
+        height={60}
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      />
     </div>
   );
 }
@@ -273,24 +503,28 @@ function StepDestination({
               type="button"
               onClick={() => onSelect(d.id)}
               aria-pressed={isSel}
-              className={`flex items-center justify-between gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-colors ${
-                isSel
-                  ? "border-brand-600 bg-brand-50 text-brand-700 ring-2 ring-brand-100"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-brand-400"
-              }`}
+              className="group relative overflow-hidden rounded-xl border-2 px-4 py-4 text-left transition-all"
+              style={{
+                borderColor: isSel ? "#2563eb" : "#e5e7eb",
+                background: isSel ? "#eff6ff" : "#ffffff",
+              }}
             >
-              <span className="flex items-center gap-2.5">
-                <MapPin
-                  size={16}
-                  className={isSel ? "text-brand-600" : "text-slate-400"}
-                />
-                {d.name}
-              </span>
-              {isSel && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-white">
-                  <Check size={12} strokeWidth={3} />
-                </span>
-              )}
+              <div className="flex items-center gap-3 justify-between">
+                <CountryFlag code={d.id} name={d.name} />
+                <div className="flex-1">
+                  <p
+                    className="text-sm font-semibold"
+                    style={{ color: isSel ? "#1e40af" : "#111827" }}
+                  >
+                    {d.name}
+                  </p>
+                </div>
+                {isSel && (
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
+                    <Check size={12} strokeWidth={3} />
+                  </div>
+                )}
+              </div>
             </button>
           );
         })}
@@ -454,12 +688,9 @@ function StepApplicants({
             </Field>
 
             <Field label="Nationality" error={errors[`applicant_${idx}_nationality`]}>
-              <Input
-                placeholder="British"
+              <NationalityDropdown
                 value={a.nationality}
-                onChange={(e) =>
-                  onApplicantChange(idx, "nationality", e.target.value)
-                }
+                onChange={(val) => onApplicantChange(idx, "nationality", val)}
                 error={!!errors[`applicant_${idx}_nationality`]}
               />
             </Field>
@@ -697,11 +928,33 @@ function ConfirmationScreen({
   const pkg = plans.find((p) => p.id === data.package);
   const destName = getDestination(data.origin, data.destination)?.name ?? "—";
   return (
-    <div className="flex flex-col items-center py-10 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-        <CheckCircle2 size={44} strokeWidth={1.75} />
-      </div>
-      <h2 className="mt-6 text-2xl font-bold text-slate-900">Booking submitted</h2>
+    <motion.div
+      className="flex flex-col items-center py-10 text-center"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.div
+        className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.4, delay: 0.1, type: "spring", stiffness: 100, damping: 12 }}
+      >
+        <motion.div
+          initial={{ rotate: -180, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <CheckCircle2 size={44} strokeWidth={1.75} />
+        </motion.div>
+      </motion.div>
+      <motion.h2
+        className="mt-6 text-2xl font-bold text-slate-900"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+      >
+        Booking submitted</motion.h2>
       <p className="mt-2 max-w-md text-slate-600">
         Thank you, <strong>{data.applicants[0]?.firstName}</strong>. Your appointment
         request has been received. We&apos;ll contact you at{" "}
@@ -747,7 +1000,7 @@ function ConfirmationScreen({
           Back to home
         </Link>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -767,18 +1020,127 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
   );
 }
 
+// ─── Airplane step transition overlay ─────────────────────────────────────────
+
+const PLANE_ICON =
+  "M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z";
+
+function AirplaneTransition({ show }: { show: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          key="plane-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center overflow-hidden"
+          style={{ borderRadius: "inherit" }}
+        >
+          {/* Frosted backdrop */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(6px)" }}
+          />
+
+          {/* Dotted flight path */}
+          <svg
+            className="absolute"
+            style={{ width: "80%", height: "60px", top: "calc(50% - 30px)", left: "10%" }}
+            viewBox="0 0 600 60"
+            fill="none"
+          >
+            <motion.path
+              d="M 0 40 C 150 0, 450 0, 600 40"
+              stroke="var(--navy-200, #c8d6e8)"
+              strokeWidth="2"
+              strokeDasharray="8 6"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            />
+          </svg>
+
+          {/* Airplane flying along path */}
+          <motion.div
+            initial={{ x: "-280px", y: "12px", rotate: -18, opacity: 0, scale: 0.8 }}
+            animate={{
+              x: ["-280px", "0px", "280px"],
+              y: ["12px", "-14px", "12px"],
+              rotate: [-18, -5, 12],
+              opacity: [0, 1, 0],
+              scale: [0.8, 1, 1],
+            }}
+            transition={{
+              duration: 0.8,
+              ease: [0.22, 1, 0.36, 1],
+              times: [0, 0.45, 1],
+            }}
+            className="relative z-10"
+          >
+            <svg width="36" height="36" viewBox="0 0 24 24" style={{ filter: "drop-shadow(0 2px 8px rgba(8,20,40,0.25))" }}>
+              <path d={PLANE_ICON} fill="var(--navy-700, #1a3055)" />
+            </svg>
+          </motion.div>
+
+          {/* Trail glow */}
+          <motion.div
+            className="absolute rounded-full"
+            style={{
+              width: "80px",
+              height: "6px",
+              background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)",
+              filter: "blur(4px)",
+              top: "calc(50% - 3px)",
+            }}
+            initial={{ x: "-320px", opacity: 0 }}
+            animate={{
+              x: ["-320px", "-40px", "240px"],
+              opacity: [0, 0.6, 0],
+            }}
+            transition={{
+              duration: 0.8,
+              ease: [0.22, 1, 0.36, 1],
+              times: [0, 0.45, 1],
+            }}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function BookingForm() {
-  const [step, setStep] = useState(1);
+export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null }) {
+  const [step, setStep] = useState(initialOrigin ? 2 : 1);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [bookingRef, setBookingRef] = useState("");
   const [errors, setErrors] = useState<Errors>({});
+  const [transitioning, setTransitioning] = useState(false);
+
+  const animateStep = useCallback((goTo: number, beforeGo?: () => void) => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      beforeGo?.();
+      setStep(goTo);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    setTransitioning(true);
+    setTimeout(() => {
+      beforeGo?.();
+      setStep(goTo);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => setTransitioning(false), 300);
+    }, 500);
+  }, []);
 
   const [formData, setFormData] = useState<FormData>({
-    origin: null,
+    origin: initialOrigin ?? null,
     centre: null,
     destination: "",
     package: "",
@@ -832,25 +1194,21 @@ export function BookingForm() {
 
   // Selecting location resets downstream choices that depend on it.
   const selectOrigin = (id: OriginId) => {
-    setFormData((prev) =>
-      prev.origin === id
-        ? prev
-        : { ...prev, origin: id, centre: null, destination: "" }
+    animateStep(2, () =>
+      setFormData((prev) =>
+        prev.origin === id
+          ? prev
+          : { ...prev, origin: id, centre: null, destination: "" }
+      )
     );
-    setStep(2);
-    scrollTop();
   };
 
   const selectCentre = (id: string) => {
-    updateField("centre", id);
-    setStep(3);
-    scrollTop();
+    animateStep(3, () => updateField("centre", id));
   };
 
   const selectDestination = (id: string) => {
-    updateField("destination", id);
-    setStep(4);
-    scrollTop();
+    animateStep(4, () => updateField("destination", id));
   };
 
   const selectPackage = (id: string) => {
@@ -875,8 +1233,7 @@ export function BookingForm() {
 
   const next = () => {
     if (!validateStep()) return;
-    setStep((s) => s + 1);
-    scrollTop();
+    animateStep(step + 1);
   };
 
   const back = () => {
@@ -965,7 +1322,8 @@ export function BookingForm() {
             </p>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-10">
+          <div className="relative rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-10">
+            <AirplaneTransition show={transitioning} />
             <ProgressBar step={step} total={STEPS.length} />
 
             <AnimatePresence mode="wait">
@@ -1040,32 +1398,57 @@ export function BookingForm() {
               )}
 
               {!autoAdvance && step < STEPS.length && (
-                <button
+                <motion.button
                   type="button"
                   onClick={next}
                   disabled={!canContinue}
                   className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  whileHover={canContinue ? { scale: 1.03 } : undefined}
+                  whileTap={canContinue ? { scale: 0.97 } : undefined}
+                  transition={{ duration: 0.15 }}
                 >
                   Continue
-                </button>
+                </motion.button>
               )}
 
               {step === STEPS.length && (
-                <button
+                <motion.button
                   type="button"
                   onClick={submit}
                   disabled={submitting}
                   className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                  whileHover={!submitting ? { scale: 1.03 } : undefined}
+                  whileTap={!submitting ? { scale: 0.97 } : undefined}
+                  transition={{ duration: 0.15 }}
                 >
-                  {submitting ? (
-                    <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Submitting…
-                    </>
-                  ) : (
-                    "Submit booking"
-                  )}
-                </button>
+                  <AnimatePresence mode="wait">
+                    {submitting ? (
+                      <motion.div
+                        key="loading"
+                        className="flex items-center gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <motion.span
+                          className="h-4 w-4 rounded-full border-2 border-white border-t-transparent"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        />
+                        Submitting…
+                      </motion.div>
+                    ) : (
+                      <motion.span
+                        key="submit"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        Submit booking
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
               )}
             </div>
           </div>

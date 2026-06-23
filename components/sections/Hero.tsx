@@ -108,35 +108,22 @@ export function Hero() {
             {/* Social proof */}
             <motion.div
               variants={item}
-              className="mt-10 flex items-center gap-5"
+              className="mt-10 flex items-center gap-1.5"
             >
-              <div className="flex -space-x-2.5">
-                {["FA","PM","OB","AS"].map((i) => (
-                  <div
-                    key={i}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[var(--navy-700)] text-[10px] font-semibold text-white"
-                    style={{ background: "var(--navy-500)" }}
-                  >
-                    {i}
-                  </div>
-                ))}
+              <div className="flex items-center gap-1.5 text-sm font-medium text-white">
+                <span className="flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star
+                      key={s}
+                      size={13}
+                      style={{ color: "var(--gold-500)", fill: "var(--gold-500)" }}
+                    />
+                  ))}
+                </span>
+                <span style={{ color: "var(--gold-500)" }}>5,000+</span> clients assisted
               </div>
-              <div>
-                <div className="flex items-center gap-1.5 text-sm font-medium text-white">
-                  <span className="flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, s) => (
-                      <Star
-                        key={s}
-                        size={13}
-                        style={{ color: "var(--gold-500)", fill: "var(--gold-500)" }}
-                      />
-                    ))}
-                  </span>
-                  <span style={{ color: "var(--gold-500)" }}>5,000+</span> clients assisted
-                </div>
-                <div className="text-xs mt-0.5" style={{ color: "rgba(240,244,255,0.5)" }}>
-                  UK &amp; Ireland applicants
-                </div>
+              <div className="text-xs" style={{ color: "rgba(240,244,255,0.5)" }}>
+                • UK &amp; Ireland applicants
               </div>
             </motion.div>
           </motion.div>

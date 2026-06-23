@@ -1,5 +1,9 @@
 "use server";
 
+/* Supabase's query builder loses its generic types on deep relational
+   selects, so these server actions cast through `any` deliberately. */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import { sendStatusUpdate } from "@/lib/email/sender";
@@ -47,7 +51,6 @@ export async function getAdminAppointments(): Promise<AdminAppointment[]> {
   await requireAdmin();
   const supabase = await createClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from("appointments")
     .select(`
@@ -76,17 +79,10 @@ export async function getAdminAppointments(): Promise<AdminAppointment[]> {
   const userIds: string[] = [...new Set(data.map((a: any) => a.user_profiles?.id).filter(Boolean))];
   const emailMap: Record<string, string> = {};
 
-  if (userIds.length) {
-    const { data: authUsers } = await (adminSupabase as any)
-      .from("user_profiles")
-      .select("id")
-      .in("id", userIds) as { data: any[] | null };
-
-    // Fetch emails via auth admin API
-    for (const uid of userIds) {
-      const { data: u } = await adminSupabase.auth.admin.getUserById(uid);
-      if (u?.user?.email) emailMap[uid] = u.user.email;
-    }
+  // Emails live in the protected auth schema — fetch via the auth admin API.
+  for (const uid of userIds) {
+    const { data: u } = await adminSupabase.auth.admin.getUserById(uid);
+    if (u?.user?.email) emailMap[uid] = u.user.email;
   }
 
   return data.map((a: any) => ({
@@ -131,7 +127,6 @@ export async function updateAppointmentStatus(
   const supabase     = await createClient();
 
   // 1. Fetch current appointment for status history + email
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: current, error: fetchError } = await (supabase as any)
     .from("appointments")
     .select("status, reference, package, destination, user_id, notes")
@@ -146,7 +141,6 @@ export async function updateAppointmentStatus(
   const updatePayload: Record<string, unknown> = { status: newStatus };
   if (notes !== undefined) updatePayload.notes = notes;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: updateError } = await (supabase as any)
     .from("appointments")
     .update(updatePayload)
@@ -157,7 +151,6 @@ export async function updateAppointmentStatus(
   }
 
   // 3. Write status history record
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (supabase as any)
     .from("status_history")
     .insert({
@@ -210,7 +203,6 @@ export async function updateAppointmentNotes(
   await requireAdmin();
   const supabase = await createClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)
     .from("appointments")
     .update({ notes })
