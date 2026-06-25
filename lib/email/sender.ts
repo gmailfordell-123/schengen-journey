@@ -10,19 +10,14 @@ import {
   statusUpdateText,
 } from "./templates";
 
-const API_KEY = process.env.RESEND_API_KEY;
-const resend  = new Resend(API_KEY);
-const FROM    = process.env.EMAIL_FROM ?? "Schengen Journey <noreply@schengenjourney.com>";
+const FROM = process.env.EMAIL_FROM ?? "Schengen Journey <noreply@schengenjourney.com>";
 
-// Email is "configured" only when a real key is present (not missing / placeholder).
-const EMAIL_ENABLED =
-  !!API_KEY && API_KEY.startsWith("re_") && !API_KEY.includes("your_resend_api_key");
-
-if (!EMAIL_ENABLED) {
-  console.warn(
-    "[email] RESEND_API_KEY not configured — emails will be skipped. " +
-      "Add a real key to .env.local to enable delivery."
-  );
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY;
+  if (!key || !key.startsWith("re_") || key.includes("your_resend_api_key")) {
+    return null;
+  }
+  return new Resend(key);
 }
 
 // ─── Booking confirmation ──────────────────────────────────────────────────────
@@ -38,7 +33,8 @@ export async function sendBookingConfirmation(data: {
   applicantCount: number;
   email: string;
 }) {
-  if (!EMAIL_ENABLED) return;
+  const resend = getResend();
+  if (!resend) return;
   try {
     await resend.emails.send({
       from:    FROM,
@@ -64,7 +60,8 @@ export async function sendStatusUpdate(data: {
   newStatus: string;
   adminNotes?: string;
 }) {
-  if (!EMAIL_ENABLED) return;
+  const resend = getResend();
+  if (!resend) return;
   try {
     await resend.emails.send({
       from:    FROM,
