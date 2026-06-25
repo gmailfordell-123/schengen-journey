@@ -4,9 +4,17 @@
    selects, so these server actions cast through `any` deliberately. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import { sendStatusUpdate } from "@/lib/email/sender";
+
+/*
+ * All reads/writes below use the service-role client. Every function is gated
+ * by requireAdmin() first, so bypassing RLS here is safe — and it is required
+ * because the user_profiles RLS policy self-references (admin check), which
+ * Postgres rejects as "infinite recursion" (42P17) for any RLS-bound query
+ * that touches user_profiles or tables whose policies reference it.
+ */
 import type { AppointmentStatus } from "@/lib/supabase/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -49,7 +57,7 @@ export type AdminResult =
 
 export async function getAdminAppointments(): Promise<AdminAppointment[]> {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { data, error } = await (supabase as any)
     .from("appointments")
@@ -71,10 +79,9 @@ export async function getAdminAppointments(): Promise<AdminAppointment[]> {
     return [];
   }
 
-  // Join auth.users email separately (it's in a protected schema)
-  // We fetch emails via the service-role client
-  const { createAdminClient } = await import("@/lib/supabase/server");
-  const adminSupabase = await createAdminClient();
+  // Emails live in the protected auth schema — fetch via the same
+  // service-role client.
+  const adminSupabase = supabase;
 
   const userIds: string[] = [...new Set(data.map((a: any) => a.user_profiles?.id).filter(Boolean))];
   const emailMap: Record<string, string> = {};
@@ -124,7 +131,7 @@ export async function updateAppointmentStatus(
   notes?: string
 ): Promise<AdminResult> {
   const adminProfile = await requireAdmin();
-  const supabase     = await createClient();
+  const supabase     = await createAdminClient();
 
   // 1. Fetch current appointment for status history + email
   const { data: current, error: fetchError } = await (supabase as any)
@@ -162,8 +169,7 @@ export async function updateAppointmentStatus(
     });
 
   // 4. Send email notification to the customer
-  const { createAdminClient } = await import("@/lib/supabase/server");
-  const adminSupabase = await createAdminClient();
+  const adminSupabase = supabase;
   const { data: profile } = await adminSupabase
     .from("user_profiles")
     .select("first_name, phone")
@@ -194,6 +200,133 @@ export async function updateAppointmentStatus(
   return { success: true };
 }
 
+// ─── Admin dashboard stats ────────────────────────────────────────────────────
+
+export type AdminStats = {
+  total: number;
+  pending: number;
+  confirmed: number;
+  completed: number;
+  cancelled: number;
+  revenue: number;
+  recent: {
+    id: string;
+    reference: string;
+    customer_name: string;
+    customer_email: string;
+    package: string;
+    destination: string;
+    status: AppointmentStatus;
+    created_at: string;
+  }[];
+};
+
+export async function getAdminStats(): Promise<AdminStats> {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+
+  const { data } = await (supabase as any)
+    .from("appointments")
+    .select(`
+      id, reference, status, package, destination, price_paid, created_at,
+      user_profiles ( id, first_name, last_name )
+    `)
+    .order("created_at", { ascending: false }) as { data: any[] | null; error: any };
+
+  if (!data) return { total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0, revenue: 0, recent: [] };
+
+  // Fetch emails only for the 5 most recent
+  const adminSupabase = supabase;
+  const recentSlice = data.slice(0, 5);
+  const recentIds: string[] = [...new Set(recentSlice.map((a: any) => a.user_profiles?.id).filter(Boolean))];
+  const emailMap: Record<string, string> = {};
+  for (const uid of recentIds) {
+    const { data: u } = await adminSupabase.auth.admin.getUserById(uid);
+    if (u?.user?.email) emailMap[uid] = u.user.email;
+  }
+
+  return {
+    total:     data.length,
+    pending:   data.filter((a: any) => a.status === "pending").length,
+    confirmed: data.filter((a: any) => a.status === "confirmed").length,
+    completed: data.filter((a: any) => a.status === "completed").length,
+    cancelled: data.filter((a: any) => a.status === "cancelled").length,
+    revenue:   data.reduce((sum: number, a: any) => sum + (a.price_paid ?? 0), 0),
+    recent: recentSlice.map((a: any) => ({
+      id:             a.id,
+      reference:      a.reference,
+      customer_name:  `${a.user_profiles?.first_name ?? ""} ${a.user_profiles?.last_name ?? ""}`.trim(),
+      customer_email: emailMap[a.user_profiles?.id] ?? "",
+      package:        a.package,
+      destination:    a.destination,
+      status:         a.status as AppointmentStatus,
+      created_at:     a.created_at,
+    })),
+  };
+}
+
+// ─── Admin customers list ──────────────────────────────────────────────────────
+
+export type AdminCustomer = {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone: string | null;
+  nationality: string | null;
+  region: string | null;
+  created_at: string;
+  appointments: {
+    id: string;
+    reference: string;
+    status: AppointmentStatus;
+    package: string;
+    destination: string;
+    created_at: string;
+  }[];
+};
+
+export async function getAdminCustomers(): Promise<AdminCustomer[]> {
+  await requireAdmin();
+  const supabase = await createAdminClient();
+
+  const { data: profiles } = await (supabase as any)
+    .from("user_profiles")
+    .select(`
+      id, first_name, last_name, phone, nationality, region, created_at,
+      appointments ( id, reference, status, package, destination, created_at )
+    `)
+    .eq("is_admin", false)
+    .order("created_at", { ascending: false }) as { data: any[] | null; error: any };
+
+  if (!profiles) return [];
+
+  // Batch-fetch all emails at once
+  const adminSupabase = supabase;
+  const { data: usersData } = await adminSupabase.auth.admin.listUsers({ perPage: 1000 });
+  const emailMap: Record<string, string> = {};
+  usersData?.users?.forEach((u: { id: string; email?: string }) => { if (u.email) emailMap[u.id] = u.email; });
+
+  return profiles.map((p: any) => ({
+    id:           p.id,
+    email:        emailMap[p.id] ?? "",
+    first_name:   p.first_name ?? "",
+    last_name:    p.last_name ?? "",
+    phone:        p.phone ?? null,
+    nationality:  p.nationality ?? null,
+    region:       p.region ?? null,
+    created_at:   p.created_at,
+    appointments: (p.appointments ?? []).map((a: any) => ({
+      id:          a.id,
+      reference:   a.reference,
+      status:      a.status as AppointmentStatus,
+      package:     a.package,
+      destination: a.destination,
+      created_at:  a.created_at,
+    })),
+  }));
+}
+
 // ─── Update appointment notes only ────────────────────────────────────────────
 
 export async function updateAppointmentNotes(
@@ -201,7 +334,7 @@ export async function updateAppointmentNotes(
   notes: string
 ): Promise<AdminResult> {
   await requireAdmin();
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { error } = await (supabase as any)
     .from("appointments")

@@ -18,7 +18,7 @@ const checklist = [
     detail: "Last 3–6 months of statements showing sufficient funds for the duration of travel.",
   },
   {
-    item: "Employment or Student Letter",
+    item: "Employment or Student Letter (if Applicable)",
     detail: "Official letter from your employer or institution confirming your status and approved leave.",
   },
   {

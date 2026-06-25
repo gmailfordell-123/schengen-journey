@@ -48,6 +48,44 @@ const PRICE_MAP: Record<PackageType, number> = {
 
 // ─── Server Action ────────────────────────────────────────────────────────────
 
+// ─── Server-side sanitisation helpers ────────────────────────────────────────
+
+function sanitizeStr(value: string, maxLen = 100): string {
+  return value.trim().slice(0, maxLen);
+}
+
+function isValidDate(d: string): boolean {
+  if (!d) return false;
+  const parsed = Date.parse(d);
+  return !isNaN(parsed);
+}
+
+function sanitizeInput(input: BookingInput): BookingInput | null {
+  // Applicant count guard
+  if (!Array.isArray(input.applicants) || input.applicants.length === 0 || input.applicants.length > 10) {
+    return null;
+  }
+
+  return {
+    package:        sanitizeStr(input.package, 60),
+    destination:    sanitizeStr(input.destination, 100),
+    email:          sanitizeStr(input.email, 254),
+    phone:          sanitizeStr(input.phone, 30),
+    travelDateFrom: input.travelDateFrom ? sanitizeStr(input.travelDateFrom, 10) : "",
+    travelDateTo:   input.travelDateTo   ? sanitizeStr(input.travelDateTo,   10) : "",
+    applicants: input.applicants.map((a) => ({
+      firstName:      sanitizeStr(a.firstName,      60),
+      lastName:       sanitizeStr(a.lastName,       60),
+      dob:            sanitizeStr(a.dob,            10),
+      nationality:    sanitizeStr(a.nationality,    60),
+      passportNo:     sanitizeStr(a.passportNo,     20),
+      passportCountry:sanitizeStr(a.passportCountry,60),
+      passportIssue:  sanitizeStr(a.passportIssue,  10),
+      passportExpiry: sanitizeStr(a.passportExpiry, 10),
+    })),
+  };
+}
+
 export async function submitBooking(input: BookingInput): Promise<BookingResult> {
   const supabase = await createClient();
 
@@ -57,13 +95,32 @@ export async function submitBooking(input: BookingInput): Promise<BookingResult>
     return { success: false, error: "You must be signed in to book an appointment." };
   }
 
-  // 2. Validate package
-  const packageEnum = PACKAGE_MAP[input.package];
+  // 2. Sanitize & validate input server-side
+  const clean = sanitizeInput(input);
+  if (!clean) {
+    return { success: false, error: "Invalid submission. Please check your details and try again." };
+  }
+
+  // Validate required fields
+  if (!clean.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean.email)) {
+    return { success: false, error: "A valid email address is required." };
+  }
+  for (const a of clean.applicants) {
+    if (!a.firstName || !a.lastName || !a.passportNo) {
+      return { success: false, error: "All applicant fields are required." };
+    }
+    if (a.passportExpiry && !isValidDate(a.passportExpiry)) {
+      return { success: false, error: "Invalid passport expiry date." };
+    }
+  }
+
+  // 3. Validate package
+  const packageEnum = PACKAGE_MAP[clean.package];
   if (!packageEnum) {
     return { success: false, error: "Invalid package selected." };
   }
 
-  // 3. Insert appointment — DB trigger auto-generates the reference (SJ-XXXXXX)
+  // 4. Insert appointment — DB trigger auto-generates the reference (SJ-XXXXXX)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: appointment, error: aptError } = await (supabase as any)
     .from("appointments")
@@ -71,9 +128,9 @@ export async function submitBooking(input: BookingInput): Promise<BookingResult>
       user_id:          user.id,
       package:          packageEnum,
       price_paid:       PRICE_MAP[packageEnum],
-      destination:      input.destination.trim(),
-      travel_date_from: input.travelDateFrom || null,
-      travel_date_to:   input.travelDateTo   || null,
+      destination:      clean.destination,
+      travel_date_from: clean.travelDateFrom || null,
+      travel_date_to:   clean.travelDateTo   || null,
       status:           "pending",
       reference:        "",   // overwritten by trg_appointments_reference trigger
     })
@@ -82,18 +139,19 @@ export async function submitBooking(input: BookingInput): Promise<BookingResult>
 
   if (aptError || !appointment) {
     console.error("Appointment insert error:", aptError);
-    return { success: false, error: aptError?.message ?? "Failed to create appointment." };
+    // Don't expose raw DB errors to the client
+    return { success: false, error: "Unable to create your appointment. Please try again." };
   }
 
-  // 4. Insert applicants (one row per person, is_primary = true for index 0)
-  const applicantRows = input.applicants.map((a, idx) => ({
+  // 5. Insert applicants (one row per person, is_primary = true for index 0)
+  const applicantRows = clean.applicants.map((a, idx) => ({
     appointment_id:      appointment.id,
-    first_name:          a.firstName.trim(),
-    last_name:           a.lastName.trim(),
+    first_name:          a.firstName,
+    last_name:           a.lastName,
     dob:                 a.dob,
-    nationality:         a.nationality.trim(),
-    passport_no:         a.passportNo.trim(),
-    passport_country:    a.passportCountry.trim(),
+    nationality:         a.nationality,
+    passport_no:         a.passportNo,
+    passport_country:    a.passportCountry,
     passport_issue_date: a.passportIssue,
     passport_expiry:     a.passportExpiry,
     is_primary:          idx === 0,
@@ -106,9 +164,10 @@ export async function submitBooking(input: BookingInput): Promise<BookingResult>
 
   if (applicantError) {
     console.error("Applicant insert error:", applicantError);
+    // Non-fatal — appointment was created, applicant details can be fixed by admin
   }
 
-  // 5. Send booking confirmation email (failure must not break the response)
+  // 6. Send booking confirmation email (failure must not break the response)
   const { sendBookingConfirmation } = await import("@/lib/email/sender");
   const { createAdminClient } = await import("@/lib/supabase/server");
   const adminSupabase = await createAdminClient();
@@ -131,11 +190,11 @@ export async function submitBooking(input: BookingInput): Promise<BookingResult>
       firstName:      profile?.first_name ?? "there",
       reference:      appointment.reference,
       packageName:    PACKAGE_LABELS[packageEnum] ?? packageEnum,
-      destination:    input.destination,
-      travelDateFrom: input.travelDateFrom,
-      travelDateTo:   input.travelDateTo,
-      applicantCount: input.applicants.length,
-      email:          input.email,
+      destination:    clean.destination,
+      travelDateFrom: clean.travelDateFrom,
+      travelDateTo:   clean.travelDateTo,
+      applicantCount: clean.applicants.length,
+      email:          clean.email,
     });
   }
 

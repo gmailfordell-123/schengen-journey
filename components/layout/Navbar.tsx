@@ -1,20 +1,24 @@
 import Link from "next/link";
+import { LogoImage } from "@/components/ui/LogoImage";
 import { Container } from "@/components/ui/Container";
 import { mainNav } from "@/lib/navigation";
 import { siteConfig } from "@/lib/site";
 import { getUser } from "@/lib/auth";
+import { NavbarScrollEffect } from "@/components/layout/NavbarScrollEffect";
+import { MobileMenu } from "@/components/layout/MobileMenu";
 
 export async function Navbar() {
   const user = await getUser();
 
   return (
     <header
-      className="sticky top-0 z-40 border-b backdrop-blur-md"
+      data-navbar
+      className="glass-navbar sticky top-0 z-40"
       style={{
-        background: "rgba(8,20,40,0.72)",
-        borderColor: "rgba(255,255,255,0.08)",
+        transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
       }}
     >
+      <NavbarScrollEffect />
       <Container>
         <div className="flex h-[4.25rem] items-center justify-between gap-6">
 
@@ -23,15 +27,8 @@ export async function Navbar() {
             href="/"
             className="flex items-center gap-2.5 shrink-0"
           >
-            <span
-              className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-sm font-semibold text-white"
-              style={{ background: "var(--navy-600)" }}
-            >
-              SJ
-            </span>
-            <span
-              className="text-[1.0625rem] font-semibold tracking-tight text-white"
-            >
+            <LogoImage size={36} />
+            <span className="text-[1.0625rem] font-semibold tracking-tight text-white">
               {siteConfig.name}
             </span>
           </Link>
@@ -42,20 +39,20 @@ export async function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="nav-link text-sm font-medium"
+                className="nav-link-underline text-sm font-medium"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          {/* Auth area */}
-          <div className="flex items-center gap-3">
+          {/* Auth area — desktop / tablet */}
+          <div className="hidden items-center gap-3 md:flex">
             {user ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="nav-link hidden text-sm font-medium sm:block"
+                  className="nav-link-underline text-sm font-medium"
                 >
                   Dashboard
                 </Link>
@@ -72,7 +69,7 @@ export async function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="nav-link hidden text-sm font-medium sm:block"
+                  className="nav-link-underline text-sm font-medium"
                 >
                   Login
                 </Link>
@@ -82,13 +79,12 @@ export async function Navbar() {
               </>
             )}
           </div>
+
+          {/* Mobile hamburger menu */}
+          <MobileMenu nav={mainNav} isAuthenticated={!!user} />
         </div>
       </Container>
 
-      <style>{`
-        .nav-link { color: rgba(240,244,255,0.72); transition: color 0.15s; }
-        .nav-link:hover { color: #ffffff; }
-      `}</style>
     </header>
   );
 }

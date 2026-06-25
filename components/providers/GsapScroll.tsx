@@ -5,13 +5,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /**
- * Sets up GSAP ScrollTrigger effects that link scroll position to section
- * transitions:
- *  - a top scroll-progress bar (scrubbed to page scroll)
- *  - parallax drift on elements marked [data-parallax]
- *  - a connector line that draws in across [data-gsap-line] as it scrolls
- *
- * Renders the progress bar itself; other targets are opted in via data attrs.
+ * Global GSAP scroll effects:
+ * - Top scroll-progress bar (scrubbed)
+ * - [data-parallax] — vertical parallax drift
+ * - [data-gsap-line] — horizontal line draw
+ * - [data-gsap-section] — premium section entrance (opacity + y, once)
+ * - [data-gsap-stagger] — children stagger reveal (once)
  */
 export function GsapScroll() {
   const barRef = useRef<HTMLDivElement>(null);
@@ -19,8 +18,11 @@ export function GsapScroll() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
+    /* Respect reduced-motion */
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const ctx = gsap.context(() => {
-      // Scroll progress bar
+      /* ── Scroll progress bar ── */
       if (barRef.current) {
         gsap.to(barRef.current, {
           scaleX: 1,
@@ -34,7 +36,9 @@ export function GsapScroll() {
         });
       }
 
-      // Parallax drift between sections
+      if (prefersReduced) return;
+
+      /* ── Parallax drift ── */
       gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
         const depth = Number(el.dataset.parallax) || 40;
         gsap.fromTo(
@@ -53,7 +57,7 @@ export function GsapScroll() {
         );
       });
 
-      // Connector line draws in as the "How it works" section scrolls
+      /* ── Connector line draw ── */
       gsap.utils.toArray<HTMLElement>("[data-gsap-line]").forEach((el) => {
         gsap.fromTo(
           el,
@@ -70,16 +74,64 @@ export function GsapScroll() {
           }
         );
       });
+
+      /* ── Section entrance (opacity + y, once) ── */
+      gsap.utils.toArray<HTMLElement>("[data-gsap-section]").forEach((el) => {
+        const delay = Number(el.dataset.gsapDelay) || 0;
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 42, willChange: "transform, opacity" },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.82,
+            delay,
+            ease: "power3.out",
+            clearProps: "willChange",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              once: true,
+            },
+          }
+        );
+      });
+
+      /* ── Children stagger reveal ── */
+      gsap.utils.toArray<HTMLElement>("[data-gsap-stagger]").forEach((el) => {
+        const staggerTime = Number(el.dataset.gsapStagger) || 0.1;
+        const children = Array.from(el.children) as HTMLElement[];
+        if (!children.length) return;
+
+        gsap.fromTo(
+          children,
+          { opacity: 0, y: 28, willChange: "transform, opacity" },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: staggerTime,
+            ease: "power3.out",
+            clearProps: "willChange",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              once: true,
+            },
+          }
+        );
+      });
     });
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[90] h-1 bg-transparent">
+    <div className="fixed inset-x-0 top-0 z-[90] h-[2px] bg-transparent pointer-events-none">
       <div
         ref={barRef}
-        className="h-full origin-left scale-x-0 bg-gradient-to-r from-brand-500 to-brand-700"
+        className="h-full origin-left scale-x-0"
+        style={{ background: "linear-gradient(90deg, var(--navy-600), var(--gold-500))" }}
       />
     </div>
   );

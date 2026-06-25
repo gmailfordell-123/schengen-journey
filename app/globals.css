@@ -114,13 +114,25 @@
   --shadow-lg: var(--shadow-lg);
 }
 
+html {
+  /* Let Lenis handle scrolling — native smooth-scroll would conflict */
+  scroll-behavior: auto;
+  /* Clip horizontal overflow globally so off-screen entrance transforms
+     (AOS fade-left/right, Framer x-offsets, decorative meteors) never widen
+     the layout or create a horizontal scrollbar on mobile/tablet.
+     `clip` (not `hidden`) avoids creating a scroll container, so the sticky
+     navbar keeps working. */
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 body {
-  /* Premium deep-navy base so no raw white is ever behind the page.
-     Marketing sections paint their own (lighter) surfaces on top; app
-     pages use <PremiumPageShell> for a richer navy gradient. */
-  background-color: var(--navy-950);
+  /* Near-black slate base — marketing sections paint over it */
+  background-color: #080b14;
   color: var(--ink-muted);
   font-family: var(--app-sans);
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 @layer base {
@@ -175,108 +187,179 @@ body {
   .btn:active { transform: translateY(0.5px); }
 
   .btn-navy {
-    background: var(--navy-600);
+    background: linear-gradient(180deg, var(--navy-500) 0%, var(--navy-700) 100%);
     color: #fff;
     padding: 0.8rem 1.75rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow:
+      0 2px 10px rgba(4,12,26,0.38),
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 0 -1px 0 rgba(0,0,0,0.16);
+    transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-navy:hover {
-    background: var(--navy-700);
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(180deg, var(--navy-400) 0%, var(--navy-600) 100%);
+    box-shadow:
+      0 4px 18px rgba(4,12,26,0.48),
+      inset 0 1px 0 rgba(255,255,255,0.22),
+      inset 0 -1px 0 rgba(0,0,0,0.16);
+    transform: translateY(-1px);
   }
+  .btn-navy:active { transform: translateY(0) scale(0.98); }
 
   .btn-gold {
-    background: var(--gold-500);
+    background: linear-gradient(180deg, var(--gold-400) 0%, var(--gold-500) 100%);
     color: var(--navy-900);
     padding: 0.8rem 1.75rem;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(201,168,76,0.35);
+    box-shadow:
+      0 2px 12px rgba(201,168,76,0.42),
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      inset 0 -1px 0 rgba(0,0,0,0.08);
+    transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-gold:hover {
-    background: var(--gold-400);
-    box-shadow: 0 4px 16px rgba(201,168,76,0.45);
+    background: linear-gradient(180deg, #e2c97a 0%, var(--gold-400) 100%);
+    box-shadow:
+      0 4px 22px rgba(201,168,76,0.58),
+      inset 0 1px 0 rgba(255,255,255,0.42),
+      inset 0 -1px 0 rgba(0,0,0,0.08);
+    transform: translateY(-1px);
   }
+  .btn-gold:active { transform: translateY(0) scale(0.98); }
 
   .btn-outline-navy {
     background: transparent;
     color: var(--navy-600);
     padding: 0.75rem 1.75rem;
-    border: 1.5px solid var(--navy-600);
+    border: 1.5px solid var(--navy-300, rgba(30,58,138,0.45));
+    transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-outline-navy:hover {
     background: var(--navy-50);
+    border-color: var(--navy-600);
+    box-shadow: 0 2px 8px rgba(30,58,138,0.15);
   }
 
+  /* Liquid glass ghost button — for dark backgrounds */
   .btn-outline-white {
-    background: transparent;
-    color: #fff;
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(10px) saturate(1.4);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4);
+    color: rgba(240,244,255,0.92);
     padding: 0.75rem 1.75rem;
-    border: 1.5px solid rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.28);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.20),
+      0 2px 10px rgba(4,12,26,0.20);
+    transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-outline-white:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.17);
+    border-color: rgba(255,255,255,0.48);
+    color: #fff;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.28),
+      0 4px 18px rgba(4,12,26,0.28),
+      0 0 0 1px rgba(255,255,255,0.10);
+    transform: translateY(-1px);
   }
+  .btn-outline-white:active { transform: translateY(0) scale(0.98); }
 
-  /* ── Cards ──────────────────────────────────────────────────────────── */
+  /* ── Cards — liquid glass ────────────────────────────────────────────── */
   .card {
-    background: var(--bg);
-    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.84) 100%);
+    backdrop-filter: blur(14px) saturate(1.5);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+    border: 1px solid rgba(255,255,255,0.88);
     border-radius: 1rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow:
+      0 4px 24px rgba(4,12,26,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      inset 0 -1px 0 rgba(4,12,26,0.04);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 border-color 0.28s ease;
   }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      0 12px 40px rgba(4,12,26,0.30),
+      inset 0 1px 0 rgba(255,255,255,0.95);
+    border-color: rgba(255,255,255,0.96);
+  }
 
-  /* Optional opt-in hover lift for static (non-motion) cards. */
+  /* opt-in hover lift for static (non-motion) cards */
   .card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(4,12,26,0.28), inset 0 1px 0 rgba(255,255,255,0.95);
   }
 
+  /* Dark glass card — for dark section backgrounds */
   .card-dark {
-    background: rgba(255,255,255,0.045);
-    border: 1px solid var(--border-navy);
+    background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    border: 1px solid rgba(255,255,255,0.14);
     border-radius: 1rem;
-    box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5);
-    transition: transform 0.25s ease, box-shadow 0.25s ease,
-      border-color 0.25s ease, background 0.25s ease;
+    box-shadow:
+      0 8px 32px rgba(4,12,26,0.44),
+      inset 0 1px 0 rgba(255,255,255,0.14);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.28s ease;
+  }
+  .card-dark:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      0 16px 48px rgba(4,12,26,0.54),
+      inset 0 1px 0 rgba(255,255,255,0.18);
+    border-color: rgba(201,168,76,0.32);
   }
 
-  /* ── Section rhythm ─────────────────────────────────────────────────────
-     "Light" surfaces are no longer flat white — they carry a soft blue-grey
-     gradient, a faint dotted grid and a radial glow for premium depth.    */
+  /* ── Section rhythm — Rich Dark + Slate theme ──────────────────────────
+     Hero / dark sections: near-black slate (#0c0f1a)
+     Mid sections: dark slate (#111827) with subtle grid
+     Light card sections: pure white (#ffffff)
+     Document / CTA: deep navy accent                                      */
+
+  /* Pure white — used for Services, Destinations, Testimonials */
   .section-light {
-    background-color: #eef3fb;
+    background-color: #ffffff;
     background-image:
-      radial-gradient(rgba(14,31,66,0.045) 1px, transparent 1px),
-      radial-gradient(900px 480px at 85% -8%, rgba(41,82,179,0.08), transparent 60%),
-      linear-gradient(180deg, #f7faff 0%, #eef3fb 100%);
-    background-size: 26px 26px, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat;
+      radial-gradient(rgba(14,31,66,0.025) 1px, transparent 1px),
+      radial-gradient(800px 400px at 90% -5%, rgba(30,58,138,0.04), transparent 55%);
+    background-size: 28px 28px, 100% 100%;
+    background-repeat: repeat, no-repeat;
   }
+
+  /* Dark slate — used for HowItWorks, WhyChooseUs, FAQ */
   .section-subtle {
-    background-color: #e9eff8;
+    background-color: #111827;
     background-image:
-      radial-gradient(rgba(14,31,66,0.05) 1px, transparent 1px),
-      radial-gradient(820px 460px at 12% 0%, rgba(30,58,138,0.09), transparent 58%),
-      linear-gradient(180deg, #eef3fb 0%, #e7eef8 100%);
-    background-size: 26px 26px, 100% 100%, 100% 100%;
+      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      radial-gradient(900px 500px at 15% 0%, rgba(41,82,179,0.12), transparent 55%),
+      linear-gradient(180deg, #0f1621 0%, #111827 100%);
+    background-size: 30px 30px, 100% 100%, 100% 100%;
     background-repeat: repeat, no-repeat, no-repeat;
-  }
-  .section-dark {
-    background-color: var(--navy-900);
-    background-image:
-      radial-gradient(900px 500px at 80% -10%, rgba(41,82,179,0.18), transparent 60%),
-      linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 100%);
     color: var(--ink-white);
   }
-  .section-navy {
-    background-color: var(--navy-800);
+
+  /* Deeper dark — kept for explicit dark-section use */
+  .section-dark {
+    background-color: #0c0f1a;
     background-image:
-      radial-gradient(820px 460px at 15% 0%, rgba(41,82,179,0.22), transparent 58%),
-      linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%);
+      radial-gradient(900px 500px at 80% -10%, rgba(41,82,179,0.15), transparent 60%),
+      linear-gradient(180deg, #080b14 0%, #0c0f1a 100%);
+    color: var(--ink-white);
+  }
+
+  /* Deep navy accent — DocumentChecklist */
+  .section-navy {
+    background-color: #0a1628;
+    background-image:
+      radial-gradient(820px 460px at 15% 0%, rgba(41,82,179,0.24), transparent 58%),
+      radial-gradient(600px 400px at 85% 100%, rgba(201,168,76,0.06), transparent 60%),
+      linear-gradient(180deg, #0d1f3c 0%, #0a1628 100%);
     color: var(--ink-white);
   }
 
@@ -293,16 +376,18 @@ body {
   .text-h1 {
     font-family: var(--app-display);
     font-weight: 700;
-    font-size: clamp(3.5rem, 2.6rem + 3.6vw, 4.5rem); /* 56 → 72px */
-    line-height: 1.05;
+    font-size: clamp(2.25rem, 1.5rem + 4vw, 4.5rem); /* 36 → 72px */
+    line-height: 1.08;
     letter-spacing: -0.03em;
+    overflow-wrap: break-word;
   }
   .text-h2 {
     font-family: var(--app-display);
     font-weight: 600;
-    font-size: clamp(2.5rem, 2rem + 2.1vw, 3.25rem); /* 40 → 52px */
-    line-height: 1.1;
+    font-size: clamp(1.75rem, 1.3rem + 2.4vw, 3.25rem); /* 28 → 52px */
+    line-height: 1.12;
     letter-spacing: -0.02em;
+    overflow-wrap: break-word;
   }
   .text-h3 {
     font-family: var(--app-display);
@@ -363,9 +448,26 @@ body {
   .text-gold { color: var(--gold-500); }
   .text-navy { color: var(--navy-600); }
 
-  /* ── Legacy class aliases so old markup keeps working ───────────────── */
-  .glass-card        { background: var(--bg); border: 1px solid var(--border); border-radius: 1rem; }
-  .glass-card-strong { background: var(--bg); border: 1px solid var(--border); border-radius: 1rem; box-shadow: var(--shadow-md); }
+  /* ── Legacy class aliases — now upgraded to real glass ───────────────── */
+  .glass-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.82) 100%);
+    backdrop-filter: blur(14px) saturate(1.5);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+    border: 1px solid rgba(255,255,255,0.88);
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px rgba(4,12,26,0.22), inset 0 1px 0 rgba(255,255,255,0.95);
+  }
+  .glass-card-strong {
+    background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    border: 1px solid rgba(255,255,255,0.92);
+    border-radius: 1rem;
+    box-shadow:
+      0 8px 40px rgba(4,12,26,0.32),
+      0 2px 8px rgba(4,12,26,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.98);
+  }
   .gradient-text     { color: var(--navy-600); }
   .gradient-bg       { background: var(--navy-600); }
   .btn-gradient      { background: var(--navy-600); color: #fff; border-radius: 9999px; }
@@ -400,6 +502,69 @@ body {
 
 /*
  * ─────────────────────────────────────────────────────────────────────────────
+ *  MAGIC UI — premium keyframe animations
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* Meteor shooting-star sweep */
+@keyframes meteor {
+  0%   { transform: rotate(215deg) translateX(0);    opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: rotate(215deg) translateX(-700px); opacity: 0; }
+}
+.animate-meteor { animation: meteor linear infinite; }
+
+/* Rotating border beam */
+@keyframes border-beam-rotate {
+  0%   { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Shimmer button sweep */
+@keyframes shimmer-sweep {
+  0%   { transform: translateX(-100%) skewX(-20deg); }
+  100% { transform: translateX(250%)  skewX(-20deg); }
+}
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 2.4s ease-in-out infinite;
+}
+
+/* Gradient text scroll */
+@keyframes gradient-text {
+  0%   { background-position: 0%   center; }
+  100% { background-position: 200% center; }
+}
+.animate-gradient-text {
+  animation: gradient-text 4s linear infinite;
+}
+
+/* Pulse glow */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(201,168,76,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(201,168,76,0.6), 0 0 80px rgba(201,168,76,0.2); }
+}
+.animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
+
+/* Float up-down */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* Spotlight sweep for hero */
+@keyframes spotlight {
+  0%   { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
+}
+
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
  *  MOTION  —  lightweight entrance animations (Framer handles the rest)
  * ─────────────────────────────────────────────────────────────────────────────
  */
@@ -412,6 +577,83 @@ body {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ── Navbar sliding underline ───────────────────────────────────────────── */
+.nav-link-underline {
+  position: relative;
+  color: rgba(240,244,255,0.72);
+  transition: color 0.18s ease;
+}
+.nav-link-underline:hover { color: #ffffff; }
+.nav-link-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: var(--gold-500);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.28s cubic-bezier(0.22,1,0.36,1);
+  border-radius: 2px;
+}
+.nav-link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ── Input focus ring animation ─────────────────────────────────────────── */
+@keyframes focus-ring-in {
+  0%   { box-shadow: 0 0 0 0 rgba(30,58,138,0.35); }
+  60%  { box-shadow: 0 0 0 4px rgba(30,58,138,0.18); }
+  100% { box-shadow: 0 0 0 3px rgba(30,58,138,0.10); }
+}
+.input-premium:focus {
+  outline: none;
+  border-color: var(--navy-500) !important;
+  animation: focus-ring-in 0.3s ease forwards;
+}
+.input-premium.input-error:focus {
+  border-color: #f87171 !important;
+  animation: none;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+}
+
+/* ── Error shake ────────────────────────────────────────────────────────── */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  15%     { transform: translateX(-6px); }
+  30%     { transform: translateX(6px); }
+  45%     { transform: translateX(-4px); }
+  60%     { transform: translateX(4px); }
+  75%     { transform: translateX(-2px); }
+}
+.animate-shake { animation: shake 0.42s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+
+/* ── Selected card border glow ──────────────────────────────────────────── */
+@keyframes border-glow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(30,58,138,0.0), 0 8px 24px -6px rgba(30,58,138,0.22); }
+  50%     { box-shadow: 0 0 0 4px rgba(30,58,138,0.14), 0 8px 24px -6px rgba(30,58,138,0.30); }
+}
+.card-selected-glow { animation: border-glow 1.8s ease-in-out infinite; }
+
+/* ── Recommended plan pulse ─────────────────────────────────────────────── */
+@keyframes recommended-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.0), 0 16px 48px -12px rgba(8,20,40,0.35); }
+  50%     { box-shadow: 0 0 0 5px rgba(201,168,76,0.12), 0 16px 48px -12px rgba(8,20,40,0.45); }
+}
+.card-recommended-pulse { animation: recommended-pulse 2.4s ease-in-out infinite; }
+
+/* ── Page transition blur ───────────────────────────────────────────────── */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(14px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0px); }
+}
+.page-enter { animation: page-enter 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
+
+/* ── Timeline line draw (GSAP targets this) ─────────────────────────────── */
+.timeline-line { transform-origin: top center; }
 
 .animate-page-in {
   animation: sj-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -428,6 +670,167 @@ body {
 .reveal-stagger > *:nth-child(5) { animation-delay: 0.28s; }
 .reveal-stagger > *:nth-child(6) { animation-delay: 0.34s; }
 
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LIQUID GLASS DESIGN SYSTEM
+ *  Apple-inspired frosted glass surfaces — designed for navy/dark backgrounds.
+ *  Every surface uses backdrop-filter + translucent fill + inner top highlight.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ── Tokens (added to root so any component can reference them) ── */
+:root {
+  /* Dark context glass — white light on dark navy */
+  --lg-dark-bg:          rgba(255, 255, 255, 0.08);
+  --lg-dark-bg-hover:    rgba(255, 255, 255, 0.13);
+  --lg-dark-border:      rgba(255, 255, 255, 0.13);
+  --lg-dark-border-hover:rgba(255, 255, 255, 0.24);
+  --lg-dark-highlight:   rgba(255, 255, 255, 0.14); /* top gloss line */
+  --lg-dark-shadow:      0 8px 32px rgba(4,12,26,0.44), inset 0 1px 0 rgba(255,255,255,0.14);
+  --lg-dark-shadow-hover:0 16px 48px rgba(4,12,26,0.56), inset 0 1px 0 rgba(255,255,255,0.18);
+  --lg-dark-blur:        blur(18px) saturate(1.5);
+
+  /* Light context glass — frosted white panel */
+  --lg-light-bg:         linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.85) 100%);
+  --lg-light-border:     rgba(255, 255, 255, 0.90);
+  --lg-light-highlight:  rgba(255, 255, 255, 0.96); /* inset top line */
+  --lg-light-shadow:     0 8px 40px rgba(4,12,26,0.32), inset 0 1px 0 rgba(255,255,255,0.95);
+  --lg-light-shadow-hover:0 20px 60px rgba(4,12,26,0.42), inset 0 1px 0 rgba(255,255,255,0.95);
+  --lg-light-blur:       blur(20px) saturate(1.6);
+
+  /* Gold glow accent */
+  --lg-gold-glow:   0 0 0 1px rgba(201,168,76,0.30), 0 0 24px rgba(201,168,76,0.14);
+  /* Navy glow accent */
+  --lg-navy-glow:   0 0 0 1px rgba(64,112,204,0.28), 0 0 20px rgba(30,58,138,0.16);
+}
+
+/* ── Dark glass surface — for cards on navy/dark backgrounds ── */
+.glass-dark {
+  background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+  backdrop-filter: var(--lg-dark-blur);
+  -webkit-backdrop-filter: var(--lg-dark-blur);
+  border: 1px solid var(--lg-dark-border);
+  box-shadow: var(--lg-dark-shadow);
+  transition:
+    box-shadow 0.28s cubic-bezier(0.22,1,0.36,1),
+    border-color 0.28s ease,
+    transform 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+.glass-dark:hover {
+  border-color: var(--lg-dark-border-hover);
+  box-shadow: var(--lg-dark-shadow-hover);
+}
+
+/* ── Light glass surface — frosted white panel on dark bg ── */
+.glass-light {
+  background: var(--lg-light-bg);
+  backdrop-filter: var(--lg-light-blur);
+  -webkit-backdrop-filter: var(--lg-light-blur);
+  border: 1px solid var(--lg-light-border);
+  box-shadow: var(--lg-light-shadow);
+  transition:
+    box-shadow 0.28s cubic-bezier(0.22,1,0.36,1),
+    border-color 0.28s ease,
+    transform 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+.glass-light:hover {
+  box-shadow: var(--lg-light-shadow-hover);
+  border-color: rgba(255,255,255,0.96);
+}
+
+/* ── Glass panel — larger frosted container (booking form, modals) ── */
+.glass-panel {
+  background: var(--lg-light-bg);
+  backdrop-filter: blur(24px) saturate(1.7);
+  -webkit-backdrop-filter: blur(24px) saturate(1.7);
+  border: 1px solid var(--lg-light-border);
+  box-shadow:
+    0 32px 80px rgba(4,12,26,0.45),
+    0 8px 24px rgba(4,12,26,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.96);
+}
+
+/* ── Navbar glass — sticky translucent header ── */
+.glass-navbar {
+  background: rgba(6, 14, 28, 0.52);
+  backdrop-filter: blur(22px) saturate(1.8);
+  -webkit-backdrop-filter: blur(22px) saturate(1.8);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.06),
+    0 4px 32px rgba(4,12,26,0.24);
+}
+
+/* ── Sidebar glass (dashboard) ── */
+.glass-sidebar {
+  background: rgba(6, 14, 28, 0.68);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset -1px 0 0 rgba(255,255,255,0.04);
+}
+
+/* ── Input: light glass ── */
+.glass-input {
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.80);
+  box-shadow: inset 0 1px 3px rgba(4,12,26,0.06), 0 1px 0 rgba(255,255,255,0.90);
+  color: var(--ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.glass-input:focus {
+  outline: none;
+  background: rgba(255,255,255,0.96);
+  border-color: rgba(64,112,204,0.55);
+  box-shadow:
+    0 0 0 3px rgba(30,58,138,0.14),
+    inset 0 1px 3px rgba(4,12,26,0.04),
+    0 1px 0 rgba(255,255,255,0.95);
+}
+.glass-input::placeholder { color: rgba(10,22,40,0.38); }
+
+/* ── Pricing card — deep navy glass (popular variant) ── */
+.glass-pricing-popular {
+  background: linear-gradient(160deg, rgba(14,31,66,0.92) 0%, rgba(6,14,28,0.90) 100%);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  border: 1.5px solid rgba(201,168,76,0.38);
+  box-shadow:
+    0 16px 56px rgba(4,12,26,0.58),
+    0 0 0 1px rgba(201,168,76,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+/* ── Selectable card — light glass on dark form bg ── */
+.glass-selectable {
+  background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.82) 100%);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: 1.5px solid rgba(255,255,255,0.78);
+  box-shadow:
+    0 4px 20px rgba(4,12,26,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+}
+.glass-selectable-selected {
+  background: linear-gradient(180deg, rgba(30,58,138,0.22) 0%, rgba(14,31,66,0.18) 100%);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  border: 2px solid rgba(64,112,204,0.55);
+  box-shadow:
+    0 0 0 3px rgba(30,58,138,0.14),
+    0 8px 28px rgba(4,12,26,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+}
+
+/* ── Gold glow shimmer keyframe ── */
+@keyframes glass-gold-pulse {
+  0%,100% { box-shadow: 0 16px 56px rgba(4,12,26,0.58), 0 0 0 1px rgba(201,168,76,0.14), inset 0 1px 0 rgba(255,255,255,0.12); }
+  50%     { box-shadow: 0 20px 64px rgba(4,12,26,0.62), 0 0 0 1px rgba(201,168,76,0.28), 0 0 28px rgba(201,168,76,0.12), inset 0 1px 0 rgba(255,255,255,0.15); }
+}
+.glass-gold-pulse { animation: glass-gold-pulse 2.6s ease-in-out infinite; }
+
 /* ── Accessibility: honour the user's reduced-motion preference ─────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -438,4 +841,80 @@ body {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  THEME SYSTEM  —  night (dark) / day (light)
+ *
+ *  Strategy: dark sections (section-subtle / section-dark / section-navy) stay
+ *  dark in both modes — their white text is only readable on dark backgrounds.
+ *  "Day mode" affects the navbar chrome, mobile menu, and section-light areas.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ── Mobile nav link: CSS-variable-driven theming ── */
+.mobile-nav-link {
+  color: var(--menu-text, rgba(240,244,255,0.70));
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.mobile-nav-link:hover {
+  background: var(--menu-item-hover, rgba(255,255,255,0.06));
+  color: var(--menu-text-strong, rgba(240,244,255,0.92));
+}
+.mobile-nav-link[data-active="true"] {
+  background: var(--menu-item-active, rgba(255,255,255,0.09));
+  color: var(--menu-text-strong, rgba(240,244,255,0.92));
+}
+
+/* ── Night mode tokens (default — no class required) ── */
+:root {
+  --menu-text:        rgba(240,244,255,0.70);
+  --menu-text-strong: rgba(240,244,255,0.92);
+  --menu-item-hover:  rgba(255,255,255,0.06);
+  --menu-item-active: rgba(255,255,255,0.09);
+}
+
+/* ── Day mode overrides ── */
+html.light {
+  --menu-text:        rgba(10,22,40,0.65);
+  --menu-text-strong: rgba(10,22,40,0.90);
+  --menu-item-hover:  rgba(10,22,40,0.04);
+  --menu-item-active: rgba(30,58,138,0.08);
+}
+
+/* Body fill between dark sections lightens slightly */
+html.light body {
+  background-color: #f0f5ff;
+}
+
+/* section-light (Services, Destinations) gets a cleaner white in day mode */
+html.light .section-light {
+  background-color: #ffffff;
+  background-image: radial-gradient(rgba(14,31,66,0.018) 1px, transparent 1px);
+}
+
+/* Dark sections STAY DARK so white text remains readable */
+/* (section-subtle, section-dark, section-navy — no override needed) */
+
+/* ── Navbar: white chrome in day mode ── */
+/* NavbarScrollEffect.tsx handles this via inline styles + MutationObserver  */
+/* so no CSS rule needed here — the JS already sets the correct bg in light   */
+/* mode. The nav-link colour and logo text do need CSS overrides though:      */
+html.light .nav-link-underline {
+  color: rgba(10,22,40,0.65);
+}
+html.light .nav-link-underline:hover {
+  color: var(--navy-700);
+}
+html.light .nav-link-underline::after {
+  background: var(--navy-600);
+}
+html.light [data-navbar] .text-white {
+  color: var(--ink) !important;
+}
+html.light [data-navbar] .btn-outline-white {
+  background: rgba(10,22,40,0.06) !important;
+  color: var(--ink) !important;
+  border-color: rgba(10,22,40,0.18) !important;
 }

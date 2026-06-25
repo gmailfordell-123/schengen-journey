@@ -66,13 +66,17 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Use service-role client to bypass RLS and read is_admin
+    // Use service-role client to bypass RLS and read is_admin.
+    // Return NO cookies so @supabase/ssr does not hydrate the user session —
+    // otherwise PostgREST would use the user's token (RLS on) and trip the
+    // recursive user_profiles policy. With no session, the service-role key
+    // stays the bearer and RLS is reliably bypassed.
     const adminSupabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       {
         cookies: {
-          getAll() { return request.cookies.getAll(); },
+          getAll() { return []; },
           setAll() {},
         },
       }

@@ -59,14 +59,9 @@ export function PremiumPageShell({
       />
 
       {/* Content layer */}
-      <motion.div
-        className={`relative z-10 ${contentClassName}`}
-        initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      >
+      <div className={`relative z-10 ${contentClassName}`}>
         {children}
-      </motion.div>
+      </div>
     </div>
   );
 }

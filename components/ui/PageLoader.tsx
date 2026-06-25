@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Lottie from "lottie-react";
-import loaderAnimation from "@/public/lottie/loader.json";
 
 /**
- * Full-screen Lottie loading animation shown on initial page load.
- * Fades out via Framer Motion once the window has loaded (or a short
- * minimum display time elapses, whichever is later).
+ * Full-screen loading indicator shown on initial page load.
+ * Uses a lightweight pure-CSS brand spinner (no animation library) and fades
+ * out via Framer Motion once the window has loaded (or a short minimum display
+ * time elapses, whichever is later).
  */
 export function PageLoader() {
   const [visible, setVisible] = useState(true);
@@ -44,12 +43,10 @@ export function PageLoader() {
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 bg-white"
         >
-          <Lottie
-            animationData={loaderAnimation}
-            loop
-            autoplay
-            style={{ width: 120, height: 120 }}
-          />
+          <div className="relative h-16 w-16">
+            <div className="absolute inset-0 rounded-full border-[3px] border-brand-100" />
+            <div className="absolute inset-0 animate-spin rounded-full border-[3px] border-transparent border-t-brand-600 border-r-gold-500" />
+          </div>
           <motion.p
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}

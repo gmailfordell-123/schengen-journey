@@ -17,64 +17,84 @@ export type ServiceIcon =
 
 export type Service = {
   icon: ServiceIcon;
+  tag: string;
   title: string;
+  subtitle: string;
   description: string;
 };
 
 export const services: Service[] = [
   {
     icon: "scheduling",
+    tag: "Appointments",
     title: "Schengen Appointment Scheduling",
+    subtitle: "Earliest available slots secured on your behalf",
     description:
-      "We identify the earliest available appointment slots at your nearest visa centre — VFS Global, TLScontact, or the consulate — and guide you through the full booking process.",
+      "We identify and secure the earliest available appointment slots at VFS Global and TLScontact centres across the UK and Ireland, managing the entire booking process for you.",
   },
   {
     icon: "form",
+    tag: "Documentation",
     title: "Visa Application Form Assistance",
+    subtitle: "Line-by-line review before submission",
     description:
-      "Our team reviews your Schengen visa application form (national visa form or standard Schengen form) line by line to ensure accuracy before submission.",
+      "Our team reviews your completed Schengen visa application form in full to ensure every section is accurate, consistent and meets the consulate's requirements before submission.",
   },
   {
     icon: "checklist",
+    tag: "Documentation",
     title: "Document Checklist & Review",
+    subtitle: "Tailored to your destination and profile",
     description:
-      "Receive a tailored checklist based on your destination country, purpose of travel, and applicant profile. We review each document before your appointment.",
+      "We prepare a personalised document checklist based on your destination country and applicant profile, then review every item before your appointment to prevent avoidable rejections.",
   },
   {
     icon: "cover-letter",
+    tag: "Documentation",
     title: "Cover Letter Preparation",
+    subtitle: "Professionally written for your application",
     description:
-      "A professionally written cover letter addressing your travel purpose, itinerary, financial standing, and ties to the UK or Ireland — a critical part of a strong application.",
+      "We prepare a professional cover letter addressing your travel purpose, itinerary and financial standing. A well-written letter significantly strengthens your Schengen visa application.",
   },
   {
     icon: "insurance",
+    tag: "Insurance",
     title: "Travel Medical Insurance",
+    subtitle: "Schengen-compliant coverage from day one",
     description:
-      "We help you obtain Schengen-compliant travel insurance with minimum €30,000 coverage, valid across all 27 member states for the full duration of your stay.",
+      "We help you obtain Schengen-compliant travel insurance with a minimum of €30,000 coverage, valid across all 27 member states for the full duration of your permitted stay.",
   },
   {
     icon: "flight",
+    tag: "Reservations",
     title: "Flight Reservation",
+    subtitle: "Confirmed itinerary accepted by all consulates",
     description:
-      "We provide genuine flight reservations (not purchased tickets) showing your intended entry and exit from the Schengen zone — acceptable to all consulates.",
+      "We provide confirmed flight reservations showing your entry and exit from the Schengen zone. These are genuine reservation records accepted as proof of travel by all Schengen consulates.",
   },
   {
     icon: "hotel",
+    tag: "Reservations",
     title: "Hotel Reservation",
+    subtitle: "Full itinerary with verified booking references",
     description:
-      "Receive hotel reservations for your full itinerary, complete with booking reference numbers, fully accepted by consulates as proof of accommodation.",
+      "We provide hotel reservations for your complete travel itinerary with verified booking reference numbers, accepted by all Schengen consulates as formal proof of accommodation.",
   },
   {
     icon: "tracking",
-    title: "Application Tracking",
+    tag: "Tracking",
+    title: "Real-Time Application Tracking",
+    subtitle: "Full visibility at every stage",
     description:
-      "Monitor your application status in real time through your personal dashboard. Receive updates at each stage from submission to decision.",
+      "Monitor your visa application status in real time through your personal dashboard. Receive status updates and detailed admin notes at every stage from submission to final decision.",
   },
   {
     icon: "support",
+    tag: "Support",
     title: "Dedicated Client Support",
+    subtitle: "Expert guidance throughout your journey",
     description:
-      "Direct access to our UK and Ireland support team throughout your application journey. We answer your questions and guide you through any complications.",
+      "Our UK and Ireland support team is available throughout your entire application process to answer questions and provide expert guidance at every step of your visa journey.",
   },
 ];
 

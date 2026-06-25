@@ -19,6 +19,9 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { BlurFade } from "@/components/ui/BlurFade";
+import { Meteors } from "@/components/ui/Meteors";
+import { AnimatedGradientText } from "@/components/ui/AnimatedGradientText";
 
 type IconType = React.ComponentType<{ size?: number | string; className?: string; style?: React.CSSProperties }>;
 
@@ -220,6 +223,7 @@ export default function VisaInformationPage() {
           background: `linear-gradient(160deg, var(--navy-950) 0%, var(--navy-800) 100%)`,
         }}
       >
+        <Meteors number={18} />
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.04]"
           style={{
@@ -237,10 +241,11 @@ export default function VisaInformationPage() {
           </nav>
 
           <div className="max-w-3xl">
+            <BlurFade delay={0.05}>
             <div className="mb-5 flex items-center gap-3">
               <span className="h-px w-8 rounded" style={{ background: "var(--gold-500)" }} />
-              <span className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: "var(--gold-500)" }}>
-                Comprehensive Guide
+              <span className="text-xs font-semibold uppercase tracking-[0.15em]">
+                <AnimatedGradientText>Comprehensive Guide</AnimatedGradientText>
               </span>
             </div>
 
@@ -269,6 +274,7 @@ export default function VisaInformationPage() {
                 </div>
               ))}
             </div>
+            </BlurFade>
           </div>
         </Container>
       </section>
@@ -304,6 +310,7 @@ export default function VisaInformationPage() {
             <article className="min-w-0 flex-1 space-y-10">
 
               {/* ══ 1. What is a Schengen Visa ══════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="what-is-schengen" />
               <InfoCard>
                 <SectionLabel>Section 01</SectionLabel>
@@ -358,8 +365,10 @@ export default function VisaInformationPage() {
                   </div>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 2. 90/180 Day Rule ══════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="90-180-rule" />
               <InfoCard>
                 <SectionLabel>Section 02</SectionLabel>
@@ -433,8 +442,10 @@ export default function VisaInformationPage() {
                   </CalloutBox>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 3. Where to Apply ════════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="where-to-apply" />
               <InfoCard>
                 <SectionLabel>Section 03</SectionLabel>
@@ -546,8 +557,10 @@ export default function VisaInformationPage() {
                   </CalloutBox>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 4. When to Apply ════════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="when-to-apply" />
               <InfoCard>
                 <SectionLabel>Section 04</SectionLabel>
@@ -637,8 +650,10 @@ export default function VisaInformationPage() {
                   </CalloutBox>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 5. Common Documents ════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="documents" />
               <InfoCard>
                 <SectionLabel>Section 05</SectionLabel>
@@ -752,8 +767,10 @@ export default function VisaInformationPage() {
                   </CalloutBox>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 6. Passport Validity ════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="passport-validity" />
               <InfoCard>
                 <SectionLabel>Section 06</SectionLabel>
@@ -824,8 +841,10 @@ export default function VisaInformationPage() {
                   </div>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 7. Travel Medical Insurance ═════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="travel-insurance" />
               <InfoCard>
                 <SectionLabel>Section 07</SectionLabel>
@@ -897,8 +916,10 @@ export default function VisaInformationPage() {
                   </CalloutBox>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 8. Visa Fees ════════════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="visa-fees" />
               <InfoCard>
                 <SectionLabel>Section 08</SectionLabel>
@@ -971,8 +992,10 @@ export default function VisaInformationPage() {
                   </CalloutBox>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 9. Processing Times ═════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="processing-times" />
               <InfoCard>
                 <SectionLabel>Section 09</SectionLabel>
@@ -1037,8 +1060,10 @@ export default function VisaInformationPage() {
                   </CalloutBox>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 10. Our Support Process ═════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="our-support" />
               <InfoCard style={{ borderColor: "var(--navy-100)", background: "var(--navy-50)" }}>
                 <SectionLabel>Section 10</SectionLabel>
@@ -1108,8 +1133,10 @@ export default function VisaInformationPage() {
                   </Link>
                 </div>
               </InfoCard>
+              </BlurFade>
 
               {/* ══ 11. Disclaimer ══════════════════════════════════════════ */}
+              <BlurFade delay={0.05}>
               <SectionAnchor id="disclaimer" />
               <div
                 className="rounded-2xl p-6 sm:p-7"
@@ -1154,6 +1181,7 @@ export default function VisaInformationPage() {
                   </p>
                 </div>
               </div>
+              </BlurFade>
 
             </article>
           </div>
@@ -1162,10 +1190,12 @@ export default function VisaInformationPage() {
 
       {/* ── Bottom CTA ───────────────────────────────────────────────────── */}
       <section
-        className="py-14"
+        className="py-14 relative overflow-hidden"
         style={{ background: "var(--navy-900)" }}
       >
+        <Meteors number={10} />
         <Container>
+          <BlurFade delay={0.05}>
           <div className="flex flex-col items-center text-center gap-5 sm:flex-row sm:text-left sm:justify-between">
             <div>
               <p className="font-semibold text-lg text-white">
@@ -1184,6 +1214,7 @@ export default function VisaInformationPage() {
               </Link>
             </div>
           </div>
+          </BlurFade>
         </Container>
       </section>
 

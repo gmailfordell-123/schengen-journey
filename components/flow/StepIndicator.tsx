@@ -3,9 +3,6 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
-/**
- * Horizontal progress indicator for the flow steps.
- */
 export function StepIndicator({
   steps,
   current,
@@ -14,44 +11,56 @@ export function StepIndicator({
   current: number;
 }) {
   return (
-    <div className="flex items-center justify-center gap-2 sm:gap-4">
-      {steps.map((label, i) => {
-        const isDone = i < current;
-        const isActive = i === current;
-        return (
-          <div key={label} className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-2">
+    <div className="w-full overflow-hidden">
+      {/* Step row */}
+      <div className="flex items-center justify-between">
+        {steps.map((label, i) => {
+          const isDone = i < current;
+          const isActive = i === current;
+          return (
+            <div key={label} className="flex flex-1 items-center">
+              {/* Circle */}
               <motion.div
                 animate={{
-                  backgroundColor:
-                    isActive || isDone ? "#2563eb" : "#e2e8f0",
-                  color: isActive || isDone ? "#ffffff" : "#64748b",
+                  backgroundColor: isDone
+                    ? "var(--gold-500)"
+                    : isActive
+                    ? "var(--navy-600)"
+                    : "rgba(255,255,255,0.10)",
+                  color: isActive || isDone ? "#fff" : "rgba(255,255,255,0.35)",
+                  border: isActive
+                    ? "2px solid var(--gold-400)"
+                    : isDone
+                    ? "2px solid var(--gold-500)"
+                    : "2px solid rgba(255,255,255,0.12)",
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold"
+                transition={{ duration: 0.2 }}
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
               >
-                {isDone ? <Check size={15} strokeWidth={3} /> : i + 1}
+                {isDone ? <Check size={11} strokeWidth={3} /> : i + 1}
               </motion.div>
-              <span
-                className={`hidden text-sm font-medium sm:block ${
-                  isActive ? "text-slate-900" : "text-slate-500"
-                }`}
-              >
-                {label}
-              </span>
+
+              {/* Connector */}
+              {i < steps.length - 1 && (
+                <div className="mx-1 h-0.5 flex-1 overflow-hidden rounded" style={{ background: "rgba(255,255,255,0.10)" }}>
+                  <motion.div
+                    initial={false}
+                    animate={{ scaleX: isDone ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="h-full origin-left"
+                    style={{ background: "var(--gold-500)" }}
+                  />
+                </div>
+              )}
             </div>
-            {i < steps.length - 1 && (
-              <div className="h-0.5 w-6 overflow-hidden rounded bg-slate-200 sm:w-10">
-                <motion.div
-                  initial={false}
-                  animate={{ scaleX: isDone ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="h-full origin-left bg-brand-600"
-                />
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {/* Active step label below */}
+      <div className="mt-2 text-center text-xs font-semibold" style={{ color: "rgba(240,244,255,0.80)" }}>
+        {steps[current]}
+      </div>
     </div>
   );
 }

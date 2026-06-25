@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Manrope, Fragment_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 /**
  * Premium type system:
@@ -48,9 +50,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${manrope.variable} ${fragmentMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full font-sans">{children}</body>
+      <head>
+        {/* Blocking script: applies saved theme class before first paint — prevents flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('sj-theme')||'dark';document.documentElement.classList.add(t);}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full font-sans">
+        <ThemeProvider>
+          {children}
+          <WhatsAppButton />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

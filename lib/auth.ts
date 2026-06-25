@@ -18,7 +18,14 @@ export async function getUser() {
 
 /**
  * Returns the user_profiles row for the authenticated user, or null.
- * Uses the anon client (respects RLS — users can only read their own row).
+ *
+ * The session is validated with the anon (cookie-bound) client. The profile
+ * row itself is read with the service-role client because the user_profiles
+ * RLS policy currently self-references (an admin check that selects from
+ * user_profiles inside a user_profiles policy), which Postgres rejects with
+ * "infinite recursion detected in policy" (42P17) on every RLS-bound read.
+ * The read stays scoped to the authenticated user's own id, so no other
+ * user's data is ever exposed.
  */
 export async function getProfile(): Promise<UserProfile | null> {
   const supabase = await createClient();
@@ -27,7 +34,8 @@ export async function getProfile(): Promise<UserProfile | null> {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data } = await supabase
+  const admin = await createAdminClient();
+  const { data } = await admin
     .from("user_profiles")
     .select("*")
     .eq("id", user.id)

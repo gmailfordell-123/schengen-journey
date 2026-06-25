@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
   ArrowLeft,
   Check,
@@ -11,8 +12,12 @@ import {
   Trash2,
   Building2,
   MapPin,
-  CheckCircle2,
+  ArrowRight,
+  ShieldCheck,
+  Lock,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { SuccessAnimation, LoadingDots } from "@/components/ui/SuccessAnimation";
 import { Container } from "@/components/ui/Container";
 import { PremiumPageShell } from "@/components/layout/PremiumPageShell";
 import { SelectableCard } from "@/components/flow/SelectableCard";
@@ -74,6 +79,7 @@ const STEPS = [
   "Centre",
   "Destination",
   "Package",
+  "Consent",
   "Applicants",
   "Review",
 ];
@@ -200,7 +206,7 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1 ${error ? "animate-shake" : ""}`}>
       <label className="text-sm font-medium text-slate-700">
         {label}
         {optional && <span className="ml-1 text-xs text-slate-400">(optional)</span>}
@@ -209,11 +215,11 @@ function Field({
       <AnimatePresence>
         {error && (
           <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
-            className="text-xs text-red-500"
+            initial={{ opacity: 0, height: 0, y: -4 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -4 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="text-xs text-red-500 overflow-hidden"
           >
             {error}
           </motion.p>
@@ -230,10 +236,8 @@ function Input(
   return (
     <input
       {...rest}
-      className={`rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 focus:scale-105 ${
-        error
-          ? "border-red-400 bg-red-50 focus:ring-red-400"
-          : "border-slate-300 bg-white focus:border-brand-500"
+      className={`input-premium glass-input w-full rounded-lg px-3 py-2.5 text-sm outline-none ${
+        error ? "input-error !border-red-400 !bg-red-50/90" : ""
       } ${className}`}
     />
   );
@@ -246,10 +250,8 @@ function Select(
   return (
     <select
       {...rest}
-      className={`rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 focus:scale-105 ${
-        error
-          ? "border-red-400 bg-red-50 focus:ring-red-400"
-          : "border-slate-300 bg-white focus:border-brand-500"
+      className={`input-premium glass-input w-full rounded-lg px-3 py-2.5 text-sm outline-none ${
+        error ? "input-error !border-red-400 !bg-red-50/90" : ""
       } ${className}`}
     >
       {children}
@@ -347,19 +349,138 @@ function StepLocation({
 // ─── City landmark photos ──────────────────────────────────────────────────────
 
 const CITY_PHOTOS: Record<string, string> = {
-  london:
-    "https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=800&q=80&fit=crop",
-  manchester:
-    "https://images.unsplash.com/photo-1440870322374-5ca64e56ecba?w=800&q=80&fit=crop",
-  birmingham:
-    "https://images.unsplash.com/photo-1670263965983-b09362d6c114?w=800&q=80&fit=crop",
-  edinburgh:
-    "https://images.unsplash.com/photo-1751922090004-6386496669c8?w=800&q=80&fit=crop",
-  dublin:
-    "https://images.unsplash.com/photo-1554191765-016992e268ee?w=800&q=80&fit=crop",
+  london:     "/images/cities/london.jpeg",
+  manchester: "/images/cities/manchester.jpeg",
+  birmingham: "/images/cities/birmingham.jpeg",
+  edinburgh:  "/images/cities/edinburgh.jpeg",
+  dublin:     "/images/cities/dublin.jpeg",
 };
 
+// ─── Tilt hook ─────────────────────────────────────────────────────────────────
+
+function useTilt(intensity = 8) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(rawY, [-0.5, 0.5], [intensity, -intensity]), { stiffness: 180, damping: 26 });
+  const rotateY = useSpring(useTransform(rawX, [-0.5, 0.5], [-intensity, intensity]), { stiffness: 180, damping: 26 });
+  const scaleS  = useSpring(1, { stiffness: 240, damping: 26 });
+
+  const onMouseMove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    rawX.set((e.clientX - r.left) / r.width - 0.5);
+    rawY.set((e.clientY - r.top)  / r.height - 0.5);
+    scaleS.set(1.03);
+  }, [rawX, rawY, scaleS]);
+
+  const onMouseLeave = useCallback(() => {
+    rawX.set(0); rawY.set(0); scaleS.set(1);
+  }, [rawX, rawY, scaleS]);
+
+  return { ref, rotateX, rotateY, scale: scaleS, onMouseMove, onMouseLeave };
+}
+
 // ─── Step: Centre ──────────────────────────────────────────────────────────────
+
+function CityCard({
+  c,
+  isSel,
+  photo,
+  onSelect,
+  index,
+}: {
+  c: { id: string; name: string };
+  isSel: boolean;
+  photo: string | undefined;
+  onSelect: (id: string) => void;
+  index: number;
+}) {
+  const tilt = useTilt(7);
+
+  return (
+    <motion.button
+      ref={tilt.ref}
+      type="button"
+      onClick={() => onSelect(c.id)}
+      onMouseMove={tilt.onMouseMove}
+      onMouseLeave={tilt.onMouseLeave}
+      aria-pressed={isSel}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        rotateX: tilt.rotateX,
+        rotateY: tilt.rotateY,
+        scale: tilt.scale,
+        transformStyle: "preserve-3d",
+        height: "188px",
+        border: isSel ? "2.5px solid var(--navy-600)" : "1.5px solid rgba(0,0,0,0.10)",
+        boxShadow: isSel
+          ? "0 12px 36px -8px rgba(30,58,138,0.35), 0 0 0 4px rgba(30,58,138,0.10)"
+          : "0 2px 8px rgba(8,20,40,0.08)",
+      }}
+      className="group relative overflow-hidden rounded-2xl"
+    >
+      {/* Photo with zoom on hover */}
+      {photo && (
+        <Image
+          src={photo}
+          alt={c.name}
+          fill
+          sizes="(max-width: 640px) 100vw, 50vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-108"
+          style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+        />
+      )}
+
+      {/* Gradient overlay — darkens on hover */}
+      <div
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{
+          background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.28) 55%, rgba(0,0,0,0.12) 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: "rgba(0,0,0,0.14)" }}
+      />
+
+      {/* Border glow on selected */}
+      <AnimatePresence>
+        {isSel && (
+          <motion.div
+            key="sel-glow"
+            className="absolute inset-0 rounded-2xl pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ boxShadow: "inset 0 0 0 2.5px var(--navy-600)" }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Content */}
+      <div className="absolute inset-0 flex items-end justify-between p-5">
+        <div>
+          <p className="text-lg font-bold text-white drop-shadow-lg">{c.name}</p>
+          <p className="text-xs mt-0.5 transition-all duration-300 group-hover:text-white/90" style={{ color: "rgba(255,255,255,0.65)" }}>
+            Visa Application Centre
+          </p>
+        </div>
+        <motion.div
+          initial={false}
+          animate={{ scale: isSel ? 1 : 0, opacity: isSel ? 1 : 0 }}
+          transition={{ type: "spring", stiffness: 420, damping: 24 }}
+          className="flex h-8 w-8 items-center justify-center rounded-full text-white shadow-lg"
+          style={{ background: "var(--navy-600)" }}
+        >
+          <Check size={16} strokeWidth={3} />
+        </motion.div>
+      </div>
+    </motion.button>
+  );
+}
 
 function StepCentre({
   origin,
@@ -374,104 +495,85 @@ function StepCentre({
   const originName = getOrigin(origin)?.name ?? "";
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-xl font-bold text-slate-900">
-          Choose your visa centre
-        </h2>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+        <h2 className="text-xl font-bold text-slate-900">Choose your visa centre</h2>
         <p className="mt-1 text-sm text-slate-500">
           {origin === "ireland"
             ? "Dublin is our supported centre for Ireland-based applicants."
             : `Select which ${originName} centre you'd like to apply through.`}
         </p>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {cities.map((c) => {
-          const isSel = selected === c.id;
-          const photo = CITY_PHOTOS[c.id];
-          return (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => onSelect(c.id)}
-              aria-pressed={isSel}
-              className="group relative overflow-hidden rounded-2xl transition-all"
-              style={{
-                height: "180px",
-                border: isSel
-                  ? "3px solid #2563eb"
-                  : "2px solid rgba(0,0,0,0.08)",
-                boxShadow: isSel
-                  ? "0 0 0 3px rgba(37,99,235,0.2)"
-                  : "0 4px 16px rgba(0,0,0,0.08)",
-              }}
-            >
-              {/* Photo background */}
-              {photo && (
-                <Image
-                  src={photo}
-                  alt={c.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              )}
-
-              {/* Gradient overlay */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.12) 100%)",
-                }}
-              />
-
-              {/* Content */}
-              <div className="absolute inset-0 flex items-end justify-between p-5">
-                <div>
-                  <p className="text-lg font-bold text-white drop-shadow-lg">
-                    {c.name}
-                  </p>
-                  <p className="text-xs text-white/70 mt-0.5">Visa Application Centre</p>
-                </div>
-                {isSel && (
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg">
-                    <Check size={16} strokeWidth={3} />
-                  </div>
-                )}
-              </div>
-            </button>
-          );
-        })}
+      </motion.div>
+      <div className="grid gap-4 sm:grid-cols-2" style={{ perspective: "800px" }}>
+        {cities.map((c, i) => (
+          <CityCard
+            key={c.id}
+            c={c}
+            isSel={selected === c.id}
+            photo={CITY_PHOTOS[c.id]}
+            onSelect={onSelect}
+            index={i}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-// ─── Real flag photos from flagcdn.com ──────────────────────────────────────────
+// ─── Local flag images (same as homepage) ──────────────────────────────────────
+
+const LOCAL_FLAGS: Record<string, string> = {
+  fr: "/images/flags/france.jpeg",
+  nl: "/images/flags/netherlands.jpeg",
+  it: "/images/flags/italy.jpeg",
+  gr: "/images/flags/greece.jpeg",
+  hu: "/images/flags/hungary.jpeg",
+  at: "/images/flags/austria.jpeg",
+  ch: "/images/flags/switzerland.jpeg",
+  dk: "/images/flags/denmark.jpeg",
+  is: "/images/flags/iceland.jpeg",
+  fi: "/images/flags/finland.jpeg",
+  be: "/images/flags/belgium.jpeg",
+  hr: "/images/flags/croatia.jpeg",
+  no: "/images/flags/norway.jpeg",
+  se: "/images/flags/sweden.jpeg",
+  de: "/images/flags/germany.jpeg",
+  pt: "/images/flags/portugal.jpeg",
+};
 
 function CountryFlag({ code, name }: { code: string; name: string }) {
+  const src = LOCAL_FLAGS[code] ?? `https://flagcdn.com/w80/${code}.png`;
   return (
     <div style={{
-      width: "32px",
-      height: "24px",
-      borderRadius: "4px",
+      width: "36px",
+      height: "26px",
+      borderRadius: "5px",
       overflow: "hidden",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.18)",
       position: "relative",
       flexShrink: 0,
     }}>
       <Image
-        src={`https://flagcdn.com/w80/${code}.png`}
+        src={src}
         alt={`${name} flag`}
-        width={80}
-        height={60}
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        fill
+        sizes="36px"
+        style={{ objectFit: "cover" }}
       />
     </div>
   );
 }
 
 // ─── Step: Destination ─────────────────────────────────────────────────────────
+
+const EASE_OUT = [0.22, 1, 0.36, 1] as [number, number, number, number];
+
+const destCardVariant = {
+  hidden: { opacity: 0, y: 20, scale: 0.97 },
+  visible: (i: number) => ({
+    opacity: 1, y: 0, scale: 1,
+    transition: { delay: i * 0.035, duration: 0.38, ease: EASE_OUT },
+  }),
+};
 
 function StepDestination({
   origin,
@@ -485,47 +587,82 @@ function StepDestination({
   const dests = destinationsByOrigin[origin];
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-xl font-bold text-slate-900">
-          Select your destination
-        </h2>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+        <h2 className="text-xl font-bold text-slate-900">Select your destination</h2>
         <p className="mt-1 text-sm text-slate-500">
-          {dests.length} Schengen destinations available for{" "}
-          {getOrigin(origin)?.name} applicants.
+          {dests.length} Schengen destinations available for {getOrigin(origin)?.name} applicants.
         </p>
-      </div>
+      </motion.div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {dests.map((d) => {
+        {dests.map((d, i) => {
           const isSel = selected === d.id;
           return (
-            <button
+            <motion.button
               key={d.id}
               type="button"
               onClick={() => onSelect(d.id)}
               aria-pressed={isSel}
-              className="group relative overflow-hidden rounded-xl border-2 px-4 py-4 text-left transition-all"
+              custom={i}
+              variants={destCardVariant}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ y: -3, scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 300, damping: 24 }}
+              className="group relative overflow-hidden rounded-xl px-4 py-4 text-left"
               style={{
-                borderColor: isSel ? "#2563eb" : "#e5e7eb",
-                background: isSel ? "#eff6ff" : "#ffffff",
+                border: isSel ? "2px solid var(--navy-600)" : "1px solid rgba(0,0,0,0.09)",
+                background: isSel ? "var(--navy-50)" : "#ffffff",
+                boxShadow: isSel
+                  ? "0 6px 22px -4px rgba(30,58,138,0.24), 0 0 0 3px rgba(30,58,138,0.08)"
+                  : "0 1px 4px rgba(8,20,40,0.06)",
               }}
             >
+              {/* Animated border on select */}
+              <AnimatePresence>
+                {isSel && (
+                  <motion.span
+                    key="border"
+                    className="pointer-events-none absolute inset-0 rounded-xl"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{ boxShadow: "inset 0 0 0 2px var(--navy-600)" }}
+                  />
+                )}
+              </AnimatePresence>
+
               <div className="flex items-center gap-3 justify-between">
-                <CountryFlag code={d.id} name={d.name} />
-                <div className="flex-1">
+                {/* Flag with reveal animation */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.035 + 0.15, duration: 0.3, ease: "backOut" }}
+                >
+                  <CountryFlag code={d.id} name={d.name} />
+                </motion.div>
+
+                <div className="flex-1 min-w-0">
                   <p
-                    className="text-sm font-semibold"
-                    style={{ color: isSel ? "#1e40af" : "#111827" }}
+                    className="text-sm font-semibold truncate transition-colors duration-200"
+                    style={{ color: isSel ? "var(--navy-700)" : "#111827" }}
                   >
                     {d.name}
                   </p>
                 </div>
-                {isSel && (
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
-                    <Check size={12} strokeWidth={3} />
-                  </div>
-                )}
+
+                {/* Animated check */}
+                <motion.div
+                  initial={false}
+                  animate={{ scale: isSel ? 1 : 0, opacity: isSel ? 1 : 0 }}
+                  transition={{ type: "spring", stiffness: 460, damping: 26 }}
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white"
+                  style={{ background: "var(--navy-600)" }}
+                >
+                  <Check size={11} strokeWidth={3} />
+                </motion.div>
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -534,6 +671,14 @@ function StepDestination({
 }
 
 // ─── Step: Package (pricing) ───────────────────────────────────────────────────
+
+const pkgCardVariant = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i: number) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: EASE_OUT },
+  }),
+};
 
 function StepPackage({
   region,
@@ -554,49 +699,214 @@ function StepPackage({
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
-        {plans.map((pkg) => (
-          <button
-            key={pkg.id}
-            type="button"
-            onClick={() => onSelect(pkg.id)}
-            className={`relative flex flex-col rounded-2xl border-2 p-5 text-left transition ${
-              selected === pkg.id
-                ? "border-brand-600 bg-brand-50 ring-2 ring-brand-200"
-                : "border-slate-200 bg-white hover:border-brand-400"
-            }`}
-          >
-            {pkg.popular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-3 py-0.5 text-xs font-semibold uppercase text-white">
-                Popular
-              </span>
-            )}
-            <p className="font-bold text-slate-900">{pkg.name}</p>
-            <p className="mt-1 text-lg font-semibold text-brand-600">
-              {formatPrice(pkg.price[region], region)}
-            </p>
-            <ul className="mt-3 space-y-1.5">
-              {pkg.features.map((f) => (
-                <li
-                  key={f}
-                  className="flex items-start gap-2 text-xs text-slate-600"
+        {plans.map((pkg, i) => {
+          const isSel = selected === pkg.id;
+          return (
+            <motion.button
+              key={pkg.id}
+              type="button"
+              onClick={() => onSelect(pkg.id)}
+              custom={i}
+              variants={pkgCardVariant}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 280, damping: 24 }}
+              className={`relative flex flex-col rounded-2xl border-2 p-5 text-left ${
+                pkg.popular ? "card-recommended-pulse" : ""
+              }`}
+              style={{
+                border: isSel
+                  ? "2px solid var(--navy-600)"
+                  : pkg.popular
+                  ? "2px solid rgba(201,168,76,0.40)"
+                  : "2px solid rgba(0,0,0,0.08)",
+                background: isSel
+                  ? "var(--navy-50)"
+                  : pkg.popular
+                  ? "linear-gradient(135deg,#fefdf9 0%,#fff 100%)"
+                  : "#ffffff",
+              }}
+            >
+              {/* Shimmer on hover */}
+              <span
+                className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] group-hover:animate-shimmer-sweep opacity-0 group-hover:opacity-100"
+                style={{ background: "linear-gradient(90deg,transparent,rgba(201,168,76,0.07),transparent)" }}
+              />
+
+              {pkg.popular && (
+                <span
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold uppercase"
+                  style={{ background: "var(--gold-500)", color: "var(--navy-900)" }}
                 >
-                  <Check
-                    size={13}
-                    strokeWidth={3}
-                    className="mt-0.5 shrink-0 text-brand-600"
-                  />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            {selected === pkg.id && (
-              <span className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-brand-600 text-white">
-                <Check size={14} strokeWidth={3} />
-              </span>
-            )}
-          </button>
-        ))}
+                  Recommended
+                </span>
+              )}
+
+              <p className="font-bold text-slate-900">{pkg.name}</p>
+              <p
+                className="mt-1 text-lg font-semibold"
+                style={{ color: "var(--navy-600)" }}
+              >
+                {formatPrice(pkg.price[region], region)}
+              </p>
+
+              <ul className="mt-3 space-y-1.5 flex-1">
+                {pkg.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-xs text-slate-600">
+                    <Check size={13} strokeWidth={3} className="mt-0.5 shrink-0" style={{ color: "var(--navy-600)" }} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Morphing selected highlight */}
+              <motion.div
+                initial={false}
+                animate={{
+                  scale: isSel ? 1 : 0,
+                  opacity: isSel ? 1 : 0,
+                  rotate: isSel ? 0 : -45,
+                }}
+                transition={{ type: "spring", stiffness: 460, damping: 26 }}
+                className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full text-white"
+                style={{ background: "var(--navy-600)" }}
+              >
+                <Check size={13} strokeWidth={3} />
+              </motion.div>
+            </motion.button>
+          );
+        })}
       </div>
+    </div>
+  );
+}
+
+// ─── Step: GDPR Consent ────────────────────────────────────────────────────────
+
+function StepConsent({
+  accepted,
+  onToggle,
+}: {
+  accepted: boolean;
+  onToggle: () => void;
+}) {
+  const points = [
+    "Full name, date of birth, and passport details for each applicant",
+    "Contact information (email address and phone number)",
+    "Travel preferences, destination, and package selections",
+  ];
+
+  return (
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+      >
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-600">
+          Important Notice
+        </p>
+        <h2 className="mt-1 text-xl font-bold text-slate-900">
+          Data Protection &amp; Privacy Consent
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Please read the following carefully before proceeding to the application form.
+        </p>
+      </motion.div>
+
+      {/* Main notice card */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08, duration: 0.38 }}
+        className="rounded-2xl border border-slate-200 bg-slate-50 p-6"
+      >
+        {/* Header row */}
+        <div className="mb-5 flex items-start gap-4">
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: "rgba(30,58,138,0.08)" }}
+          >
+            <ShieldCheck size={22} style={{ color: "var(--navy-700)" }} />
+          </div>
+          <div>
+            <p className="font-semibold text-slate-900">
+              Restricted-Environment Form Processing
+            </p>
+            <p className="mt-0.5 text-sm text-slate-500">
+              Our form-filling system operates within a highly controlled and
+              secure data environment in full compliance with UK GDPR and
+              European GDPR Regulation (EU) 2016/679.
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-200 pt-5">
+          <p className="mb-3 text-sm font-semibold text-slate-700">
+            The following personal data will be collected and processed solely for the purpose of your Schengen visa appointment:
+          </p>
+          <ul className="space-y-2.5">
+            {points.map((pt) => (
+              <li key={pt} className="flex items-start gap-2.5 text-sm text-slate-600">
+                <span
+                  className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                  style={{ background: "rgba(30,58,138,0.10)" }}
+                >
+                  <Check size={11} strokeWidth={3} style={{ color: "var(--navy-700)" }} />
+                </span>
+                {pt}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
+          <div className="flex items-start gap-2.5">
+            <Lock size={14} className="mt-0.5 shrink-0" style={{ color: "var(--navy-600)" }} />
+            <p className="text-xs leading-relaxed text-slate-500">
+              Your data is encrypted in transit and at rest, stored on EU/UK-based servers, and will never be sold or shared with third parties. You may request deletion of your data at any time by contacting our Data Protection Officer. This service operates under the UK Data Protection Act 2018 and complies with all applicable Schengen Area embassy data-handling requirements.
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Consent checkbox */}
+      <motion.button
+        type="button"
+        onClick={onToggle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.18, duration: 0.3 }}
+        className="flex w-full items-start gap-3 rounded-xl border-2 p-4 text-left transition-colors"
+        style={{
+          borderColor: accepted ? "var(--navy-600)" : "rgba(0,0,0,0.12)",
+          background: accepted ? "var(--navy-50)" : "#ffffff",
+        }}
+      >
+        {/* Custom checkbox */}
+        <span
+          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all"
+          style={{
+            borderColor: accepted ? "var(--navy-600)" : "#94a3b8",
+            background: accepted ? "var(--navy-600)" : "transparent",
+          }}
+        >
+          {accepted && (
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 520, damping: 24 }}
+            >
+              <Check size={12} strokeWidth={3.5} color="white" />
+            </motion.span>
+          )}
+        </span>
+        <p className="text-sm text-slate-700">
+          I have read and understood the data protection notice above. I consent to Schengen Journey processing my personal data for the purpose of arranging my Schengen visa appointment, in accordance with UK GDPR and EU GDPR regulations.
+        </p>
+      </motion.button>
     </div>
   );
 }
@@ -620,173 +930,211 @@ function StepApplicants({
 }) {
   return (
     <div className="space-y-6">
-      <div>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+      >
         <h2 className="text-xl font-bold text-slate-900">Applicant information</h2>
         <p className="mt-1 text-sm text-slate-500">
           Provide details exactly as they appear on each applicant&apos;s passport.
         </p>
-      </div>
+      </motion.div>
 
-      {data.applicants.map((a, idx) => (
-        <div
-          key={idx}
-          className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm font-semibold text-slate-700">
-              {idx === 0 ? "Primary applicant" : `Applicant ${idx + 1}`}
-            </p>
-            {idx > 0 && (
-              <button
-                type="button"
-                onClick={() => onRemoveApplicant(idx)}
-                className="inline-flex items-center gap-1 text-xs text-red-500 transition-colors hover:text-red-700"
+      <AnimatePresence initial={false}>
+        {data.applicants.map((a, idx) => (
+          <motion.div
+            key={idx}
+            layout
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.97 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-700">
+                {idx === 0 ? "Primary applicant" : `Applicant ${idx + 1}`}
+              </p>
+              {idx > 0 && (
+                <motion.button
+                  type="button"
+                  onClick={() => onRemoveApplicant(idx)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.94 }}
+                  className="inline-flex items-center gap-1 text-xs text-red-500 transition-colors hover:text-red-700"
+                >
+                  <Trash2 size={13} />
+                  Remove
+                </motion.button>
+              )}
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="First name" error={errors[`applicant_${idx}_firstName`]}>
+                <Input
+                  placeholder="Jane"
+                  value={a.firstName}
+                  onChange={(e) => onApplicantChange(idx, "firstName", e.target.value)}
+                  error={!!errors[`applicant_${idx}_firstName`]}
+                />
+              </Field>
+              <Field label="Last name" error={errors[`applicant_${idx}_lastName`]}>
+                <Input
+                  placeholder="Smith"
+                  value={a.lastName}
+                  onChange={(e) => onApplicantChange(idx, "lastName", e.target.value)}
+                  error={!!errors[`applicant_${idx}_lastName`]}
+                />
+              </Field>
+
+              <Field label="Gender" error={errors[`applicant_${idx}_gender`]}>
+                <Select
+                  value={a.gender}
+                  onChange={(e) => onApplicantChange(idx, "gender", e.target.value)}
+                  error={!!errors[`applicant_${idx}_gender`]}
+                >
+                  <option value="">Select…</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </Select>
+              </Field>
+              <Field label="Date of birth" error={errors[`applicant_${idx}_dob`]}>
+                <Input
+                  type="date"
+                  value={a.dob}
+                  onChange={(e) => onApplicantChange(idx, "dob", e.target.value)}
+                  error={!!errors[`applicant_${idx}_dob`]}
+                />
+              </Field>
+
+              <Field label="Nationality" error={errors[`applicant_${idx}_nationality`]}>
+                <NationalityDropdown
+                  value={a.nationality}
+                  onChange={(val) => onApplicantChange(idx, "nationality", val)}
+                  error={!!errors[`applicant_${idx}_nationality`]}
+                />
+              </Field>
+              <Field
+                label="Passport number"
+                error={errors[`applicant_${idx}_passportNo`]}
               >
-                <Trash2 size={13} />
-                Remove
-              </button>
-            )}
-          </div>
+                <Input
+                  placeholder="P1234567"
+                  value={a.passportNo}
+                  onChange={(e) =>
+                    onApplicantChange(idx, "passportNo", e.target.value)
+                  }
+                  error={!!errors[`applicant_${idx}_passportNo`]}
+                />
+              </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="First name" error={errors[`applicant_${idx}_firstName`]}>
-              <Input
-                placeholder="Jane"
-                value={a.firstName}
-                onChange={(e) => onApplicantChange(idx, "firstName", e.target.value)}
-                error={!!errors[`applicant_${idx}_firstName`]}
-              />
-            </Field>
-            <Field label="Last name" error={errors[`applicant_${idx}_lastName`]}>
-              <Input
-                placeholder="Smith"
-                value={a.lastName}
-                onChange={(e) => onApplicantChange(idx, "lastName", e.target.value)}
-                error={!!errors[`applicant_${idx}_lastName`]}
-              />
-            </Field>
-
-            <Field label="Gender" error={errors[`applicant_${idx}_gender`]}>
-              <Select
-                value={a.gender}
-                onChange={(e) => onApplicantChange(idx, "gender", e.target.value)}
-                error={!!errors[`applicant_${idx}_gender`]}
+              <Field
+                label="Passport country of issue"
+                error={errors[`applicant_${idx}_passportCountry`]}
               >
-                <option value="">Select…</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </Select>
-            </Field>
-            <Field label="Date of birth" error={errors[`applicant_${idx}_dob`]}>
-              <Input
-                type="date"
-                value={a.dob}
-                onChange={(e) => onApplicantChange(idx, "dob", e.target.value)}
-                error={!!errors[`applicant_${idx}_dob`]}
-              />
-            </Field>
+                <Input
+                  placeholder="United Kingdom"
+                  value={a.passportCountry}
+                  onChange={(e) =>
+                    onApplicantChange(idx, "passportCountry", e.target.value)
+                  }
+                  error={!!errors[`applicant_${idx}_passportCountry`]}
+                />
+              </Field>
+              <Field
+                label="Passport issue date"
+                error={errors[`applicant_${idx}_passportIssue`]}
+              >
+                <Input
+                  type="date"
+                  value={a.passportIssue}
+                  onChange={(e) =>
+                    onApplicantChange(idx, "passportIssue", e.target.value)
+                  }
+                  error={!!errors[`applicant_${idx}_passportIssue`]}
+                />
+              </Field>
 
-            <Field label="Nationality" error={errors[`applicant_${idx}_nationality`]}>
-              <NationalityDropdown
-                value={a.nationality}
-                onChange={(val) => onApplicantChange(idx, "nationality", val)}
-                error={!!errors[`applicant_${idx}_nationality`]}
-              />
-            </Field>
-            <Field
-              label="Passport number"
-              error={errors[`applicant_${idx}_passportNo`]}
-            >
-              <Input
-                placeholder="P1234567"
-                value={a.passportNo}
-                onChange={(e) =>
-                  onApplicantChange(idx, "passportNo", e.target.value)
-                }
-                error={!!errors[`applicant_${idx}_passportNo`]}
-              />
-            </Field>
+              <Field
+                label="Passport expiry date"
+                error={errors[`applicant_${idx}_passportExpiry`]}
+              >
+                <Input
+                  type="date"
+                  value={a.passportExpiry}
+                  onChange={(e) =>
+                    onApplicantChange(idx, "passportExpiry", e.target.value)
+                  }
+                  error={!!errors[`applicant_${idx}_passportExpiry`]}
+                />
+              </Field>
+            </div>
+          </motion.div>
+        ))}
+      </AnimatePresence>
 
-            <Field
-              label="Passport country of issue"
-              error={errors[`applicant_${idx}_passportCountry`]}
-            >
-              <Input
-                placeholder="United Kingdom"
-                value={a.passportCountry}
-                onChange={(e) =>
-                  onApplicantChange(idx, "passportCountry", e.target.value)
-                }
-                error={!!errors[`applicant_${idx}_passportCountry`]}
-              />
-            </Field>
-            <Field
-              label="Passport issue date"
-              error={errors[`applicant_${idx}_passportIssue`]}
-            >
-              <Input
-                type="date"
-                value={a.passportIssue}
-                onChange={(e) =>
-                  onApplicantChange(idx, "passportIssue", e.target.value)
-                }
-                error={!!errors[`applicant_${idx}_passportIssue`]}
-              />
-            </Field>
-
-            <Field
-              label="Passport expiry date"
-              error={errors[`applicant_${idx}_passportExpiry`]}
-            >
-              <Input
-                type="date"
-                value={a.passportExpiry}
-                onChange={(e) =>
-                  onApplicantChange(idx, "passportExpiry", e.target.value)
-                }
-                error={!!errors[`applicant_${idx}_passportExpiry`]}
-              />
-            </Field>
-          </div>
-        </div>
-      ))}
-
-      <button
+      {/* Add applicant button — spring lift */}
+      <motion.button
         type="button"
         onClick={onAddApplicant}
-        className="inline-flex items-center gap-2 rounded-xl border border-dashed border-brand-400 px-4 py-2.5 text-sm font-medium text-brand-600 transition hover:bg-brand-50"
+        whileHover={{ scale: 1.02, y: -1 }}
+        whileTap={{ scale: 0.97 }}
+        transition={{ type: "spring", stiffness: 320, damping: 22 }}
+        className="inline-flex items-center gap-2 rounded-xl border border-dashed px-4 py-2.5 text-sm font-medium transition-colors hover:bg-slate-50"
+        style={{ borderColor: "var(--navy-400)", color: "var(--navy-600)" }}
       >
-        <Plus size={16} /> Add another applicant
-      </button>
+        <motion.span
+          whileHover={{ rotate: 90 }}
+          transition={{ type: "spring", stiffness: 380, damping: 20 }}
+        >
+          <Plus size={16} />
+        </motion.span>
+        Add another applicant
+      </motion.button>
 
-      {/* Contact + extras (booking-level) */}
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+      {/* Contact + extras — stagger reveal */}
+      <motion.div
+        className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+      >
         <p className="mb-4 text-sm font-semibold text-slate-700">
           Contact details
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Email address" error={errors.email}>
-            <Input
-              type="email"
-              placeholder="jane@email.com"
-              value={data.email}
-              onChange={(e) => onFieldChange("email", e.target.value)}
-              error={!!errors.email}
-            />
-          </Field>
-          <Field label="Phone number" error={errors.phone}>
-            <Input
-              type="tel"
-              placeholder="+44 7000 000000"
-              value={data.phone}
-              onChange={(e) => onFieldChange("phone", e.target.value)}
-              error={!!errors.phone}
-            />
-          </Field>
+          <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15, duration: 0.3 }}>
+            <Field label="Email address" error={errors.email}>
+              <Input
+                type="email"
+                placeholder="jane@email.com"
+                value={data.email}
+                onChange={(e) => onFieldChange("email", e.target.value)}
+                error={!!errors.email}
+              />
+            </Field>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2, duration: 0.3 }}>
+            <Field label="Phone number" error={errors.phone}>
+              <Input
+                type="tel"
+                placeholder="+44 7000 000000"
+                value={data.phone}
+                onChange={(e) => onFieldChange("phone", e.target.value)}
+                error={!!errors.phone}
+              />
+            </Field>
+          </motion.div>
         </div>
 
-        <div className="mt-4">
+        <motion.div
+          className="mt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.26, duration: 0.3 }}
+        >
           <Field
             label="Do you need travel medical insurance?"
             error={errors.insurance}
@@ -795,38 +1143,56 @@ function StepApplicants({
               {(["yes", "no"] as const).map((opt) => {
                 const active = data.insurance === opt;
                 return (
-                  <button
+                  <motion.button
                     key={opt}
                     type="button"
                     onClick={() => onFieldChange("insurance", opt)}
                     aria-pressed={active}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
                     className={`flex flex-1 items-center justify-center gap-2 rounded-lg border-2 px-4 py-2.5 text-sm font-medium capitalize transition-colors ${
                       active
                         ? "border-brand-600 bg-brand-50 text-brand-700"
                         : "border-slate-200 bg-white text-slate-600 hover:border-brand-400"
                     }`}
                   >
-                    {active && <Check size={14} strokeWidth={3} />}
+                    <AnimatePresence>
+                      {active && (
+                        <motion.span
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ type: "spring", stiffness: 420, damping: 22 }}
+                        >
+                          <Check size={14} strokeWidth={3} />
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                     {opt}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
           </Field>
-        </div>
+        </motion.div>
 
-        <div className="mt-4">
+        <motion.div
+          className="mt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.32, duration: 0.3 }}
+        >
           <Field label="Additional information" optional>
             <textarea
               rows={3}
               placeholder="Anything else we should know about your trip or application…"
               value={data.additionalInfo}
               onChange={(e) => onFieldChange("additionalInfo", e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500"
+              className="input-premium rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 w-full resize-none outline-none transition"
             />
           </Field>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
@@ -927,79 +1293,96 @@ function ConfirmationScreen({
 }) {
   const pkg = plans.find((p) => p.id === data.package);
   const destName = getDestination(data.origin, data.destination)?.name ?? "—";
+
+  const rows = [
+    { label: "Reference",   value: reference,               mono: true },
+    { label: "Package",     value: pkg?.name ?? "—" },
+    { label: "Applicants",  value: String(data.applicants.length) },
+    { label: "Destination", value: destName },
+  ];
+
   return (
     <motion.div
       className="flex flex-col items-center py-10 text-center"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div
-        className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.1, type: "spring", stiffness: 100, damping: 12 }}
-      >
-        <motion.div
-          initial={{ rotate: -180, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <CheckCircle2 size={44} strokeWidth={1.75} />
-        </motion.div>
-      </motion.div>
+      {/* Premium SVG success animation */}
+      <SuccessAnimation size={92} />
+
       <motion.h2
-        className="mt-6 text-2xl font-bold text-slate-900"
+        className="mt-7 text-2xl font-bold text-slate-900"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.62 }}
+      >
+        Booking submitted
+      </motion.h2>
+
+      <motion.p
+        className="mt-2 max-w-md text-slate-600"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
+        transition={{ duration: 0.4, delay: 0.74 }}
       >
-        Booking submitted</motion.h2>
-      <p className="mt-2 max-w-md text-slate-600">
         Thank you, <strong>{data.applicants[0]?.firstName}</strong>. Your appointment
         request has been received. We&apos;ll contact you at{" "}
         <strong>{data.email}</strong> within 24 hours to confirm your appointment.
-      </p>
+      </motion.p>
 
-      <div className="mt-8 w-full max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-6 text-left">
+      {/* Details card with stagger rows */}
+      <motion.div
+        className="mt-8 w-full max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-6 text-left"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.85 }}
+      >
         <div className="space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-slate-500">Reference</span>
-            <span className="font-mono font-semibold text-slate-900">
-              {reference}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Package</span>
-            <span className="font-medium text-slate-900">{pkg?.name}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Applicants</span>
-            <span className="font-medium text-slate-900">
-              {data.applicants.length}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Destination</span>
-            <span className="font-medium text-slate-900">{destName}</span>
-          </div>
+          {rows.map((row, i) => (
+            <motion.div
+              key={row.label}
+              className="flex justify-between"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.9 + i * 0.07, duration: 0.3 }}
+            >
+              <span className="text-slate-500">{row.label}</span>
+              <span className={`font-medium text-slate-900 ${row.mono ? "font-mono" : ""}`}>
+                {row.value}
+              </span>
+            </motion.div>
+          ))}
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-8 flex gap-3">
-        <Link
-          href="/dashboard"
-          className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
-        >
-          Go to dashboard
-        </Link>
-        <Link
-          href="/"
-          className="rounded-xl border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-        >
-          Back to home
-        </Link>
-      </div>
+      <motion.div
+        className="mt-8 flex gap-3"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.18, duration: 0.35 }}
+      >
+        <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}>
+          <Link
+            href="/dashboard"
+            className="relative overflow-hidden rounded-xl px-6 py-2.5 text-sm font-semibold text-white inline-flex items-center gap-2"
+            style={{ background: "var(--navy-700)" }}
+          >
+            <span className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] animate-shimmer-sweep"
+              style={{ background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)" }} />
+            <span className="relative z-10">Go to dashboard</span>
+            <ArrowRight size={14} className="relative z-10" />
+          </Link>
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Link
+            href="/"
+            className="rounded-xl border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            Back to home
+          </Link>
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -1114,6 +1497,7 @@ function AirplaneTransition({ show }: { show: boolean }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null }) {
+  const router = useRouter();
   const [step, setStep] = useState(initialOrigin ? 2 : 1);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1121,6 +1505,7 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
   const [bookingRef, setBookingRef] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [transitioning, setTransitioning] = useState(false);
+  const [gdprAccepted, setGdprAccepted] = useState(false);
 
   const animateStep = useCallback((goTo: number, beforeGo?: () => void) => {
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1150,6 +1535,32 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     insurance: "",
     additionalInfo: "",
   });
+
+  // Restore draft saved before login redirect
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("sj-booking-draft");
+      if (!raw) return;
+      const draft = JSON.parse(raw) as {
+        origin?: OriginId;
+        centre?: string;
+        destination?: string;
+        package?: string;
+        returnStep?: number;
+      };
+      sessionStorage.removeItem("sj-booking-draft");
+      setFormData((prev) => ({
+        ...prev,
+        origin: draft.origin ?? prev.origin,
+        centre: draft.centre ?? prev.centre,
+        destination: draft.destination ?? prev.destination,
+        package: draft.package ?? prev.package,
+      }));
+      setGdprAccepted(true);
+      if (draft.returnStep) setStep(draft.returnStep);
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // origin doubles as the pricing region (uk | ireland)
   const region: Region = (formData.origin ?? "uk") as Region;
@@ -1192,6 +1603,31 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
       applicants: prev.applicants.filter((_, i) => i !== idx),
     }));
 
+  // GDPR consent step — check auth, then either redirect to login or proceed
+  const proceedFromConsent = useCallback(async () => {
+    if (!gdprAccepted) return;
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      // Save selections so they can be restored after login
+      try {
+        sessionStorage.setItem("sj-booking-draft", JSON.stringify({
+          origin: formData.origin,
+          centre: formData.centre,
+          destination: formData.destination,
+          package: formData.package,
+          returnStep: 6, // Applicants (step 6 in new numbering)
+        }));
+      } catch {}
+      router.push("/login?next=/book");
+      return;
+    }
+
+    // Already authenticated — go straight to Applicants
+    animateStep(6);
+  }, [gdprAccepted, formData, animateStep, router]);
+
   // Selecting location resets downstream choices that depend on it.
   const selectOrigin = (id: OriginId) => {
     animateStep(2, () =>
@@ -1224,7 +1660,8 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     if (step === 2 && !formData.centre) e.centre = "Required";
     if (step === 3 && !formData.destination) e.destination = "Required";
     if (step === 4 && !formData.package) e.package = "Required";
-    if (step === 5) {
+    if (step === 5 && !gdprAccepted) e.gdpr = "You must accept the data protection notice to continue";
+    if (step === 6) {
       e = { ...validateApplicants(formData.applicants), ...validateContact(formData) };
     }
     setErrors(e);
@@ -1285,15 +1722,16 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     if (step === 2) return !!formData.centre;
     if (step === 3) return !!formData.destination;
     if (step === 4) return !!formData.package;
+    if (step === 5) return gdprAccepted;
     return true;
-  }, [step, formData]);
+  }, [step, formData, gdprAccepted]);
 
   if (submitted) {
     return (
       <PremiumPageShell>
         <section className="py-20">
           <Container>
-            <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl">
+            <div className="glass-panel mx-auto max-w-2xl rounded-3xl p-8">
               <ConfirmationScreen data={formData} reference={bookingRef} />
             </div>
           </Container>
@@ -1322,7 +1760,7 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
             </p>
           </div>
 
-          <div className="relative rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-10">
+          <div className="glass-panel relative rounded-3xl p-6 sm:p-10">
             <AirplaneTransition show={transitioning} />
             <ProgressBar step={step} total={STEPS.length} />
 
@@ -1362,6 +1800,12 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
                   />
                 )}
                 {step === 5 && (
+                  <StepConsent
+                    accepted={gdprAccepted}
+                    onToggle={() => setGdprAccepted((v) => !v)}
+                  />
+                )}
+                {step === 6 && (
                   <StepApplicants
                     data={formData}
                     errors={errors}
@@ -1371,7 +1815,7 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
                     onRemoveApplicant={removeApplicant}
                   />
                 )}
-                {step === 6 && <StepReview data={formData} region={region} />}
+                {step === 7 && <StepReview data={formData} region={region} />}
               </motion.div>
             </AnimatePresence>
 
@@ -1400,14 +1844,14 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
               {!autoAdvance && step < STEPS.length && (
                 <motion.button
                   type="button"
-                  onClick={next}
+                  onClick={step === 5 ? proceedFromConsent : next}
                   disabled={!canContinue}
                   className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                   whileHover={canContinue ? { scale: 1.03 } : undefined}
                   whileTap={canContinue ? { scale: 0.97 } : undefined}
                   transition={{ duration: 0.15 }}
                 >
-                  Continue
+                  {step === 5 ? "I Agree — Continue" : "Continue"}
                 </motion.button>
               )}
 
@@ -1416,35 +1860,43 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
                   type="button"
                   onClick={submit}
                   disabled={submitting}
-                  className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
-                  whileHover={!submitting ? { scale: 1.03 } : undefined}
+                  className="relative overflow-hidden flex items-center gap-2 rounded-xl px-7 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+                  style={{ background: submitting ? "var(--navy-800)" : "var(--navy-700)" }}
+                  whileHover={!submitting ? { scale: 1.03, y: -1 } : undefined}
                   whileTap={!submitting ? { scale: 0.97 } : undefined}
-                  transition={{ duration: 0.15 }}
+                  transition={{ type: "spring", stiffness: 340, damping: 22 }}
                 >
+                  {/* Shimmer sweep on idle */}
+                  {!submitting && (
+                    <span
+                      className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] animate-shimmer-sweep"
+                      style={{ background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent)" }}
+                    />
+                  )}
                   <AnimatePresence mode="wait">
                     {submitting ? (
                       <motion.div
                         key="loading"
-                        className="flex items-center gap-2"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        className="flex items-center gap-2.5 relative z-10"
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.18 }}
                       >
-                        <motion.span
-                          className="h-4 w-4 rounded-full border-2 border-white border-t-transparent"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        />
-                        Submitting…
+                        <LoadingDots color="rgba(255,255,255,0.9)" />
+                        <span>Submitting</span>
                       </motion.div>
                     ) : (
                       <motion.span
                         key="submit"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        className="relative z-10 flex items-center gap-2"
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.18 }}
                       >
                         Submit booking
+                        <ArrowRight size={14} />
                       </motion.span>
                     )}
                   </AnimatePresence>
