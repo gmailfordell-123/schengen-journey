@@ -62,6 +62,7 @@ export const plans: Plan[] = [
       "Assistance in filling visa application form",
       "Travel medical insurance",
       "Cover letter",
+      "Exclusive 24/7 WhatsApp chat support",
     ],
   },
   {
@@ -78,6 +79,7 @@ export const plans: Plan[] = [
       "Travel medical insurance (1 year valid)",
       "Cover letter",
       "Application tracking service",
+      "Exclusive 24/7 WhatsApp chat support",
     ],
   },
 ];

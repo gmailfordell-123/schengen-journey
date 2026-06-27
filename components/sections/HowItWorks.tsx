@@ -33,7 +33,7 @@ export function HowItWorks() {
                 className="overflow-hidden rounded-xl transition-all duration-200"
                 style={{
                   background: isOpen ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${isOpen ? "rgba(201,168,76,0.35)" : "rgba(255,255,255,0.10)"}`,
+                  border: `1px solid ${isOpen ? "rgba(34,111,84,0.45)" : "rgba(255,255,255,0.10)"}`,
                   boxShadow: isOpen ? "0 4px 20px rgba(0,0,0,0.25)" : "none",
                 }}
               >

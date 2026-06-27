@@ -1,34 +1,45 @@
-import { PageLoader } from "@/components/ui/PageLoader";
-import { AOSInit } from "@/components/providers/AOSInit";
-import { GsapScroll } from "@/components/providers/GsapScroll";
-import { SmoothScroll } from "@/components/providers/SmoothScroll";
+"use client";
+
+import dynamic from "next/dynamic";
 import { Hero } from "@/components/sections/Hero";
-import { CountrySelector } from "@/components/sections/CountrySelector";
-import { Services } from "@/components/sections/Services";
-import { HowItWorks } from "@/components/sections/HowItWorks";
-import { Destinations } from "@/components/sections/Destinations";
-import { DocumentChecklist } from "@/components/sections/DocumentChecklist";
-import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { FAQ } from "@/components/sections/FAQ";
-import { ContactCTA } from "@/components/sections/ContactCTA";
+
+// Defer GSAP providers — they don't affect initial render
+const SmoothScroll = dynamic(
+  () => import("@/components/providers/SmoothScroll").then((m) => ({ default: m.SmoothScroll })),
+  { ssr: false }
+);
+const GsapScroll = dynamic(
+  () => import("@/components/providers/GsapScroll").then((m) => ({ default: m.GsapScroll })),
+  { ssr: false }
+);
+
+// Lazy-load all below-fold sections
+const CountrySelector   = dynamic(() => import("@/components/sections/CountrySelector").then((m) => ({ default: m.CountrySelector })));
+const Services          = dynamic(() => import("@/components/sections/Services").then((m) => ({ default: m.Services })));
+const HowItWorks        = dynamic(() => import("@/components/sections/HowItWorks").then((m) => ({ default: m.HowItWorks })));
+const Destinations      = dynamic(() => import("@/components/sections/Destinations").then((m) => ({ default: m.Destinations })));
+const DocumentChecklist = dynamic(() => import("@/components/sections/DocumentChecklist").then((m) => ({ default: m.DocumentChecklist })));
+const WhyChooseUs       = dynamic(() => import("@/components/sections/WhyChooseUs").then((m) => ({ default: m.WhyChooseUs })));
+const Testimonials      = dynamic(() => import("@/components/sections/Testimonials").then((m) => ({ default: m.Testimonials })));
+const FAQ               = dynamic(() => import("@/components/sections/FAQ").then((m) => ({ default: m.FAQ })));
+const ContactCTA        = dynamic(() => import("@/components/sections/ContactCTA").then((m) => ({ default: m.ContactCTA })));
+const AppointmentProofs = dynamic(() => import("@/components/sections/AppointmentProofs").then((m) => ({ default: m.AppointmentProofs })));
 
 export default function HomePage() {
   return (
     <>
       <SmoothScroll />
-      <PageLoader />
-      <AOSInit />
       <GsapScroll />
 
       <Hero />
+      <Testimonials />
+      <AppointmentProofs />
       <CountrySelector />
       <Services />
       <HowItWorks />
       <Destinations />
       <DocumentChecklist />
       <WhyChooseUs />
-      <Testimonials />
       <FAQ />
       <ContactCTA />
     </>

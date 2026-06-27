@@ -48,9 +48,7 @@ const CARDS = [
     cta: "Continue from United Kingdom",
     centres: ["London", "Manchester", "Birmingham", "Edinburgh"],
     Flag: UKFlag,
-    // Big Ben / Houses of Parliament at dusk — Unsplash
-    image:
-      "https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=1600&q=85&fit=crop",
+    image: "/images/uk-bg.jpg",
     ctaColor: "#e07c18",
   },
   {
@@ -63,9 +61,7 @@ const CARDS = [
     cta: "Continue from Ireland",
     centres: ["Dublin"],
     Flag: IrelandFlag,
-    // Cliffs of Moher, Ireland — Unsplash
-    image:
-      "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=1600&q=85&fit=crop",
+    image: "/images/ireland-bg.jpg",
     ctaColor: "#1fa85a",
   },
 ] as const;

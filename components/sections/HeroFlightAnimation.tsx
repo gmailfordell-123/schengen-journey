@@ -101,18 +101,18 @@ export function HeroFlightAnimation() {
       >
         <defs>
           <linearGradient id="hero-gradient" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="var(--navy-400)" />
-            <stop offset="50%" stopColor="var(--gold-500)" />
-            <stop offset="100%" stopColor="var(--navy-400)" />
+            <stop offset="0%" stopColor="var(--navy-500)" />
+            <stop offset="50%" stopColor="var(--navy-400)" />
+            <stop offset="100%" stopColor="var(--navy-500)" />
           </linearGradient>
           <linearGradient id="hero-trail" x1="1" y1="0" x2="0" y2="0">
-            <stop offset="0%" stopColor="var(--gold-400)" stopOpacity="0.9" />
-            <stop offset="55%" stopColor="var(--gold-500)" stopOpacity="0.30" />
-            <stop offset="100%" stopColor="var(--gold-500)" stopOpacity="0" />
+            <stop offset="0%" stopColor="#3aab80" stopOpacity="0.9" />
+            <stop offset="55%" stopColor="#226F54" stopOpacity="0.30" />
+            <stop offset="100%" stopColor="#226F54" stopOpacity="0" />
           </linearGradient>
           <radialGradient id="hero-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="var(--gold-400)" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="var(--gold-400)" stopOpacity="0" />
+            <stop offset="0%" stopColor="#3aab80" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#226F54" stopOpacity="0" />
           </radialGradient>
           <filter id="hero-blur" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="5" />
@@ -145,8 +145,8 @@ export function HeroFlightAnimation() {
 
         {/* Origin marker */}
         <g>
-          <circle cx="60" cy="240" r="9" fill="var(--navy-800)" stroke="var(--gold-500)" strokeWidth="2" />
-          <circle cx="60" cy="240" r="3" fill="var(--gold-500)" />
+          <circle cx="60" cy="240" r="9" fill="var(--navy-800)" stroke="#226F54" strokeWidth="2" />
+          <circle cx="60" cy="240" r="3" fill="#226F54" />
           <text x="60" y="268" textAnchor="middle" fill="rgba(240,244,255,0.65)" fontSize="12" fontWeight="600" fontFamily="var(--app-sans)">
             UK &amp; Ireland
           </text>
@@ -154,8 +154,8 @@ export function HeroFlightAnimation() {
 
         {/* Destination marker */}
         <g>
-          <circle cx="640" cy="220" r="9" fill="var(--navy-800)" stroke="var(--gold-500)" strokeWidth="2" />
-          <circle cx="640" cy="220" r="3" fill="var(--gold-500)" />
+          <circle cx="640" cy="220" r="9" fill="var(--navy-800)" stroke="#226F54" strokeWidth="2" />
+          <circle cx="640" cy="220" r="3" fill="#226F54" />
           <text x="640" y="248" textAnchor="middle" fill="rgba(240,244,255,0.65)" fontSize="12" fontWeight="600" fontFamily="var(--app-sans)">
             Schengen Area
           </text>
@@ -168,7 +168,7 @@ export function HeroFlightAnimation() {
           <g transform="rotate(45) scale(1.4)">
             <g transform="translate(-12,-12)">
               <path d={PLANE_PATH} fill="#ffffff" />
-              <path d={PLANE_PATH} fill="none" stroke="var(--gold-400)" strokeWidth="0.6" />
+              <path d={PLANE_PATH} fill="none" stroke="#3aab80" strokeWidth="0.6" />
             </g>
           </g>
         </g>
@@ -188,7 +188,7 @@ export function HeroFlightAnimation() {
             className="px-4 py-4 text-center"
             style={{ borderRight: i === 0 ? "1px solid rgba(255,255,255,0.08)" : "none" }}
           >
-            <p className="text-lg font-semibold" style={{ color: "var(--gold-500)" }}>{stat.value}</p>
+            <p className="text-lg font-semibold" style={{ color: "#3aab80" }}>{stat.value}</p>
             <p className="text-[11px] mt-0.5" style={{ color: "rgba(240,244,255,0.45)" }}>{stat.label}</p>
           </div>
         ))}

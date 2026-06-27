@@ -94,19 +94,19 @@ export function PricingPlans() {
                 className={`relative flex cursor-pointer flex-col rounded-2xl p-8 ${isPopular ? "glass-pricing-popular glass-gold-pulse lg:-mt-4" : ""}`}
                 style={!isPopular ? {
                   background: isSelected
-                    ? "linear-gradient(160deg, #152544 0%, #0c1a36 100%)"
-                    : "linear-gradient(160deg, #0f1d3a 0%, #091525 100%)",
+                    ? "linear-gradient(160deg, #0d2a1e 0%, #061510 100%)"
+                    : "linear-gradient(160deg, #0a0a0a 0%, #050505 100%)",
                   border: isSelected
-                    ? "2px solid rgba(64,112,204,0.55)"
+                    ? "2px solid rgba(34,111,84,0.60)"
                     : "1px solid rgba(255,255,255,0.09)",
                   boxShadow: isSelected
-                    ? "0 0 0 3px rgba(30,58,138,0.18), 0 20px 52px rgba(4,12,26,0.55), inset 0 1px 0 rgba(255,255,255,0.10)"
-                    : "0 8px 32px rgba(4,12,26,0.44), inset 0 1px 0 rgba(255,255,255,0.07)",
+                    ? "0 0 0 3px rgba(34,111,84,0.16), 0 20px 52px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.10)"
+                    : "0 8px 32px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.07)",
                   transition: "box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease",
                 } : undefined}
               >
                 {/* Animated border on popular card */}
-                {isPopular && <BorderBeam duration={6} colorFrom="#c9a84c" colorTo="#4070cc" />}
+                {isPopular && <BorderBeam duration={6} colorFrom="#226F54" colorTo="#3aab80" />}
 
                 {/* Popular badge */}
                 {isPopular && (
@@ -200,9 +200,9 @@ export function PricingPlans() {
                       <span
                         className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
                         style={{
-                          background: "rgba(201,168,76,0.13)",
-                          color: "var(--gold-400)",
-                          border: "1px solid rgba(201,168,76,0.22)",
+                          background: "rgba(34,111,84,0.15)",
+                          color: "#3aab80",
+                          border: "1px solid rgba(34,111,84,0.30)",
                         }}
                       >
                         <Check size={11} strokeWidth={3} />
@@ -226,7 +226,7 @@ export function PricingPlans() {
                           background: "var(--gold-500)",
                           color: "var(--navy-900)",
                           borderRadius: "9999px",
-                          boxShadow: "0 4px 20px rgba(201,168,76,0.35)",
+                          boxShadow: "0 4px 20px rgba(34,111,84,0.35)",
                         }
                       : {
                           background: "rgba(255,255,255,0.07)",

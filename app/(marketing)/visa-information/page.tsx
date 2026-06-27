@@ -110,9 +110,9 @@ function CalloutBox({
     },
     gold: {
       bg: "var(--gold-100)",
-      border: "rgba(201,168,76,0.30)",
-      iconBg: "rgba(201,168,76,0.15)",
-      iconColor: "var(--gold-500)",
+      border: "rgba(34,111,84,0.30)",
+      iconBg: "rgba(34,111,84,0.15)",
+      iconColor: "#3aab80",
       titleColor: "var(--ink)",
       Icon: Star as IconType,
     },

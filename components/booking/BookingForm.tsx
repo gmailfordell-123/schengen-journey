@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback, useRef, useEffect } from "react";
+import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,9 @@ import {
   ArrowRight,
   ShieldCheck,
   Lock,
+  Plane,
+  Briefcase,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { SuccessAnimation, LoadingDots } from "@/components/ui/SuccessAnimation";
@@ -50,10 +53,13 @@ type Applicant = {
   passportExpiry: string;
 };
 
+type VisaCategory = "" | "tourist" | "business" | "family";
+
 type FormData = {
   origin: OriginId | null;
   centre: string | null;
-  destination: string; // destination id
+  destination: string;
+  visaCategory: VisaCategory;
   package: string;
   applicants: Applicant[];
   email: string;
@@ -78,10 +84,39 @@ const STEPS = [
   "Location",
   "Centre",
   "Destination",
+  "Visa Type",
   "Package",
   "Consent",
   "Applicants",
   "Review",
+];
+
+// ─── Visa category metadata ────────────────────────────────────────────────────
+
+const VISA_CATEGORIES: {
+  id: VisaCategory;
+  label: string;
+  sub: string;
+  Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+}[] = [
+  {
+    id: "tourist",
+    label: "Tourist",
+    sub: "Sightseeing, leisure & short holidays",
+    Icon: Plane,
+  },
+  {
+    id: "business",
+    label: "Business",
+    sub: "Meetings, conferences & training",
+    Icon: Briefcase,
+  },
+  {
+    id: "family",
+    label: "Visit EU / EEA Family Member",
+    sub: "Visiting a family member residing in the Schengen Area",
+    Icon: Users,
+  },
 ];
 
 // ─── Nationality dropdown component ────────────────────────────────────────────
@@ -417,8 +452,8 @@ function CityCard({
         height: "188px",
         border: isSel ? "2.5px solid var(--navy-600)" : "1.5px solid rgba(0,0,0,0.10)",
         boxShadow: isSel
-          ? "0 12px 36px -8px rgba(30,58,138,0.35), 0 0 0 4px rgba(30,58,138,0.10)"
-          : "0 2px 8px rgba(8,20,40,0.08)",
+          ? "0 12px 36px -8px rgba(34,111,84,0.35), 0 0 0 4px rgba(34,111,84,0.10)"
+          : "0 2px 8px rgba(0,0,0,0.10)",
       }}
       className="group relative overflow-hidden rounded-2xl"
     >
@@ -614,8 +649,8 @@ function StepDestination({
                 border: isSel ? "2px solid var(--navy-600)" : "1px solid rgba(0,0,0,0.09)",
                 background: isSel ? "var(--navy-50)" : "#ffffff",
                 boxShadow: isSel
-                  ? "0 6px 22px -4px rgba(30,58,138,0.24), 0 0 0 3px rgba(30,58,138,0.08)"
-                  : "0 1px 4px rgba(8,20,40,0.06)",
+                  ? "0 6px 22px -4px rgba(34,111,84,0.24), 0 0 0 3px rgba(34,111,84,0.08)"
+                  : "0 1px 4px rgba(0,0,0,0.08)",
               }}
             >
               {/* Animated border on select */}
@@ -670,6 +705,93 @@ function StepDestination({
   );
 }
 
+// ─── Step: Visa Category ──────────────────────────────────────────────────────
+
+function StepVisaCategory({
+  selected,
+  onSelect,
+}: {
+  selected: VisaCategory;
+  onSelect: (id: VisaCategory) => void;
+}) {
+  return (
+    <div className="space-y-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+        <h2 className="text-xl font-bold text-slate-900">What is the purpose of your visit?</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Select the visa category that best matches your trip.
+        </p>
+      </motion.div>
+
+      <div className="grid gap-4">
+        {VISA_CATEGORIES.map((cat, i) => {
+          const isSel = selected === cat.id;
+          return (
+            <motion.button
+              key={cat.id}
+              type="button"
+              onClick={() => onSelect(cat.id)}
+              aria-pressed={isSel}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative flex items-center gap-5 rounded-2xl p-5 text-left transition-all"
+              style={{
+                border: isSel ? "2px solid var(--navy-600)" : "1.5px solid rgba(0,0,0,0.09)",
+                background: isSel ? "rgba(34,111,84,0.06)" : "#ffffff",
+                boxShadow: isSel
+                  ? "0 6px 22px -4px rgba(34,111,84,0.22), 0 0 0 3px rgba(34,111,84,0.08)"
+                  : "0 1px 4px rgba(0,0,0,0.07)",
+              }}
+            >
+              {/* Icon badge */}
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                style={{
+                  background: isSel ? "rgba(34,111,84,0.14)" : "rgba(0,0,0,0.05)",
+                  border: isSel ? "1px solid rgba(34,111,84,0.25)" : "1px solid rgba(0,0,0,0.08)",
+                }}
+              >
+                <cat.Icon
+                  size={22}
+                  strokeWidth={1.75}
+                  style={{ color: isSel ? "#226F54" : "#64748b" }}
+                />
+              </div>
+
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <p
+                  className="font-semibold text-[0.95rem]"
+                  style={{ color: isSel ? "#1a5c43" : "#111827" }}
+                >
+                  {cat.label}
+                </p>
+                <p className="mt-0.5 text-sm" style={{ color: "rgba(0,0,0,0.48)" }}>
+                  {cat.sub}
+                </p>
+              </div>
+
+              {/* Check */}
+              <motion.div
+                initial={false}
+                animate={{ scale: isSel ? 1 : 0, opacity: isSel ? 1 : 0 }}
+                transition={{ type: "spring", stiffness: 460, damping: 26 }}
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white"
+                style={{ background: "var(--navy-600)" }}
+              >
+                <Check size={13} strokeWidth={3} />
+              </motion.div>
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Step: Package (pricing) ───────────────────────────────────────────────────
 
 const pkgCardVariant = {
@@ -690,17 +812,27 @@ function StepPackage({
   onSelect: (id: string) => void;
 }) {
   const currencyLabel = region === "uk" ? "GBP (£)" : "EUR (€)";
+  const regionLabel   = region === "uk" ? "United Kingdom" : "Ireland";
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900">Choose your package</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Prices shown in {currencyLabel} for {region === "uk" ? "United Kingdom" : "Ireland"} applicants.
+        <p className="text-[10px] font-bold uppercase tracking-[0.20em]" style={{ color: "var(--gold-500)" }}>
+          Step 5 of 8
+        </p>
+        <h2 className="mt-1 text-xl font-bold text-white">Choose your package</h2>
+        <p className="mt-1 text-sm" style={{ color: "rgba(200,218,255,0.55)" }}>
+          Prices in {currencyLabel} · {regionLabel} applicants
         </p>
       </div>
+
       <div className="grid gap-4 sm:grid-cols-3">
         {plans.map((pkg, i) => {
-          const isSel = selected === pkg.id;
+          const isSel    = selected === pkg.id;
+          const isPop    = !!pkg.popular;
+          const isPlat   = pkg.id === "platinum-complete-plan";
+
           return (
             <motion.button
               key={pkg.id}
@@ -710,71 +842,130 @@ function StepPackage({
               variants={pkgCardVariant}
               initial="hidden"
               animate="visible"
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
               whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 280, damping: 24 }}
-              className={`relative flex flex-col rounded-2xl border-2 p-5 text-left ${
-                pkg.popular ? "card-recommended-pulse" : ""
-              }`}
+              className="relative flex flex-col rounded-2xl p-5 text-left"
               style={{
-                border: isSel
-                  ? "2px solid var(--navy-600)"
-                  : pkg.popular
-                  ? "2px solid rgba(201,168,76,0.40)"
-                  : "2px solid rgba(0,0,0,0.08)",
                 background: isSel
-                  ? "var(--navy-50)"
-                  : pkg.popular
-                  ? "linear-gradient(135deg,#fefdf9 0%,#fff 100%)"
-                  : "#ffffff",
+                  ? "linear-gradient(145deg, #0d2a1e 0%, #061510 100%)"
+                  : isPop
+                  ? "linear-gradient(145deg, #0a2218 0%, #060f0a 100%)"
+                  : "linear-gradient(145deg, #0a0a0a 0%, #050505 100%)",
+                border: isSel
+                  ? "2px solid var(--gold-400)"
+                  : isPop
+                  ? "2px solid rgba(34,111,84,0.50)"
+                  : "1.5px solid rgba(255,255,255,0.09)",
+                boxShadow: isSel
+                  ? "0 0 0 4px rgba(34,111,84,0.12), 0 20px 48px rgba(0,0,0,0.65)"
+                  : isPop
+                  ? "0 12px 40px rgba(0,0,0,0.55)"
+                  : "0 8px 28px rgba(0,0,0,0.45)",
               }}
             >
-              {/* Shimmer on hover */}
-              <span
-                className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] group-hover:animate-shimmer-sweep opacity-0 group-hover:opacity-100"
-                style={{ background: "linear-gradient(90deg,transparent,rgba(201,168,76,0.07),transparent)" }}
-              />
-
-              {pkg.popular && (
+              {/* Popular badge */}
+              {isPop && (
                 <span
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold uppercase"
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap"
                   style={{ background: "var(--gold-500)", color: "var(--navy-900)" }}
                 >
                   Recommended
                 </span>
               )}
 
-              <p className="font-bold text-slate-900">{pkg.name}</p>
-              <p
-                className="mt-1 text-lg font-semibold"
-                style={{ color: "var(--navy-600)" }}
-              >
-                {formatPrice(pkg.price[region], region)}
-              </p>
-
-              <ul className="mt-3 space-y-1.5 flex-1">
-                {pkg.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs text-slate-600">
-                    <Check size={13} strokeWidth={3} className="mt-0.5 shrink-0" style={{ color: "var(--navy-600)" }} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              {/* Morphing selected highlight */}
+              {/* Selected tick */}
               <motion.div
                 initial={false}
-                animate={{
-                  scale: isSel ? 1 : 0,
-                  opacity: isSel ? 1 : 0,
-                  rotate: isSel ? 0 : -45,
-                }}
+                animate={{ scale: isSel ? 1 : 0, opacity: isSel ? 1 : 0 }}
                 transition={{ type: "spring", stiffness: 460, damping: 26 }}
-                className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full text-white"
-                style={{ background: "var(--navy-600)" }}
+                className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full"
+                style={{ background: "var(--gold-500)" }}
               >
-                <Check size={13} strokeWidth={3} />
+                <Check size={12} strokeWidth={3} style={{ color: "var(--navy-900)" }} />
               </motion.div>
+
+              {/* Plan name */}
+              <p
+                className="text-[0.95rem] font-bold leading-snug pr-7"
+                style={{ color: isSel ? "var(--gold-300)" : "rgba(240,244,255,0.95)" }}
+              >
+                {pkg.name}
+              </p>
+
+              {/* Tagline */}
+              <p className="mt-1 text-[11px] leading-snug" style={{ color: "rgba(180,200,240,0.50)" }}>
+                {pkg.tagline}
+              </p>
+
+              {/* Price */}
+              <p
+                className="mt-4 text-2xl font-black tracking-tight"
+                style={{
+                  color: isPop ? "var(--gold-400)" : isSel ? "var(--gold-300)" : "rgba(240,244,255,0.90)",
+                  fontFamily: "var(--app-display)",
+                }}
+              >
+                {formatPrice(pkg.price[region], region)}
+                <span className="ml-1 text-[11px] font-semibold" style={{ color: "rgba(180,200,240,0.40)" }}>
+                  one-time
+                </span>
+              </p>
+
+              {/* Divider */}
+              <div className="my-4 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
+
+              {/* Features */}
+              <ul className="flex-1 space-y-2">
+                {pkg.features.map((f) => {
+                  const isWA = f.toLowerCase().includes("whatsapp");
+                  return (
+                    <li key={f} className="flex items-start gap-2">
+                      <span
+                        className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
+                        style={{
+                          background: isWA
+                            ? "rgba(37,211,102,0.18)"
+                            : "rgba(34,111,84,0.18)",
+                          border: isWA
+                            ? "1px solid rgba(37,211,102,0.35)"
+                            : "1px solid rgba(34,111,84,0.30)",
+                        }}
+                      >
+                        <Check
+                          size={9}
+                          strokeWidth={3}
+                          style={{ color: isWA ? "#25d366" : "#3aab80" }}
+                        />
+                      </span>
+                      <span
+                        className="text-[11.5px] leading-snug font-medium"
+                        style={{
+                          color: isWA
+                            ? "rgba(37,211,102,0.90)"
+                            : "rgba(200,218,255,0.72)",
+                          fontWeight: isWA ? 600 : 500,
+                        }}
+                      >
+                        {f}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {/* Bottom CTA hint */}
+              <div
+                className="mt-5 rounded-lg py-2 text-center text-[11px] font-semibold tracking-wide"
+                style={{
+                  background: isSel
+                    ? "rgba(34,111,84,0.15)"
+                    : "rgba(255,255,255,0.05)",
+                  color: isSel ? "#3aab80" : "rgba(180,200,240,0.40)",
+                  border: isSel ? "1px solid rgba(34,111,84,0.30)" : "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                {isSel ? "Selected — tap Continue" : isPlat ? "Best value" : isPop ? "Most popular" : "Get started"}
+              </div>
             </motion.button>
           );
         })}
@@ -827,7 +1018,7 @@ function StepConsent({
         <div className="mb-5 flex items-start gap-4">
           <div
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-            style={{ background: "rgba(30,58,138,0.08)" }}
+            style={{ background: "rgba(34,111,84,0.08)" }}
           >
             <ShieldCheck size={22} style={{ color: "var(--navy-700)" }} />
           </div>
@@ -852,7 +1043,7 @@ function StepConsent({
               <li key={pt} className="flex items-start gap-2.5 text-sm text-slate-600">
                 <span
                   className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-                  style={{ background: "rgba(30,58,138,0.10)" }}
+                  style={{ background: "rgba(34,111,84,0.10)" }}
                 >
                   <Check size={11} strokeWidth={3} style={{ color: "var(--navy-700)" }} />
                 </span>
@@ -1210,6 +1401,7 @@ function StepReview({
   const originName = getOrigin(data.origin)?.name ?? "—";
   const centreName = getCity(data.origin, data.centre)?.name ?? "—";
   const destName = getDestination(data.origin, data.destination)?.name ?? "—";
+  const visaCatLabel = VISA_CATEGORIES.find((c) => c.id === data.visaCategory)?.label ?? "—";
 
   return (
     <div className="space-y-5">
@@ -1220,6 +1412,7 @@ function StepReview({
           <ReviewRow label="Applying from" value={originName} />
           <ReviewRow label="Visa centre" value={centreName} />
           <ReviewRow label="Destination" value={destName} />
+          <ReviewRow label="Visa type" value={visaCatLabel} />
           <ReviewRow
             label="Package"
             value={
@@ -1473,7 +1666,7 @@ function AirplaneTransition({ show }: { show: boolean }) {
             style={{
               width: "80px",
               height: "6px",
-              background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)",
+              background: "linear-gradient(90deg, transparent, rgba(34,111,84,0.5), transparent)",
               filter: "blur(4px)",
               top: "calc(50% - 3px)",
             }}
@@ -1528,6 +1721,7 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     origin: initialOrigin ?? null,
     centre: null,
     destination: "",
+    visaCategory: "",
     package: "",
     applicants: [emptyApplicant()],
     email: "",
@@ -1617,7 +1811,7 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
           centre: formData.centre,
           destination: formData.destination,
           package: formData.package,
-          returnStep: 6, // Applicants (step 6 in new numbering)
+          returnStep: 7, // Applicants (step 7 in new numbering)
         }));
       } catch {}
       router.push("/login?next=/book");
@@ -1625,7 +1819,7 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     }
 
     // Already authenticated — go straight to Applicants
-    animateStep(6);
+    animateStep(7);
   }, [gdprAccepted, formData, animateStep, router]);
 
   // Selecting location resets downstream choices that depend on it.
@@ -1647,6 +1841,10 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     animateStep(4, () => updateField("destination", id));
   };
 
+  const selectVisaCategory = (id: VisaCategory) => {
+    animateStep(5, () => updateField("visaCategory", id));
+  };
+
   const selectPackage = (id: string) => {
     updateField("package", id);
   };
@@ -1659,9 +1857,10 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     if (step === 1 && !formData.origin) e.origin = "Required";
     if (step === 2 && !formData.centre) e.centre = "Required";
     if (step === 3 && !formData.destination) e.destination = "Required";
-    if (step === 4 && !formData.package) e.package = "Required";
-    if (step === 5 && !gdprAccepted) e.gdpr = "You must accept the data protection notice to continue";
-    if (step === 6) {
+    if (step === 4 && !formData.visaCategory) e.visaCategory = "Please select a visa type";
+    if (step === 5 && !formData.package) e.package = "Required";
+    if (step === 6 && !gdprAccepted) e.gdpr = "You must accept the data protection notice to continue";
+    if (step === 7) {
       e = { ...validateApplicants(formData.applicants), ...validateContact(formData) };
     }
     setErrors(e);
@@ -1721,8 +1920,9 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     if (step === 1) return !!formData.origin;
     if (step === 2) return !!formData.centre;
     if (step === 3) return !!formData.destination;
-    if (step === 4) return !!formData.package;
-    if (step === 5) return gdprAccepted;
+    if (step === 4) return !!formData.visaCategory;
+    if (step === 5) return !!formData.package;
+    if (step === 6) return gdprAccepted;
     return true;
   }, [step, formData, gdprAccepted]);
 
@@ -1740,8 +1940,8 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
     );
   }
 
-  // Steps 1–3 auto-advance on selection, so they don't need a Continue button.
-  const autoAdvance = step <= 3;
+  // Steps 1–4 auto-advance on selection, so they don't need a Continue button.
+  const autoAdvance = step <= 4;
 
   return (
     <PremiumPageShell>
@@ -1793,19 +1993,25 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
                   />
                 )}
                 {step === 4 && (
+                  <StepVisaCategory
+                    selected={formData.visaCategory}
+                    onSelect={selectVisaCategory}
+                  />
+                )}
+                {step === 5 && (
                   <StepPackage
                     region={region}
                     selected={formData.package}
                     onSelect={selectPackage}
                   />
                 )}
-                {step === 5 && (
+                {step === 6 && (
                   <StepConsent
                     accepted={gdprAccepted}
                     onToggle={() => setGdprAccepted((v) => !v)}
                   />
                 )}
-                {step === 6 && (
+                {step === 7 && (
                   <StepApplicants
                     data={formData}
                     errors={errors}
@@ -1815,7 +2021,7 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
                     onRemoveApplicant={removeApplicant}
                   />
                 )}
-                {step === 7 && <StepReview data={formData} region={region} />}
+                {step === 8 && <StepReview data={formData} region={region} />}
               </motion.div>
             </AnimatePresence>
 
@@ -1844,14 +2050,14 @@ export function BookingForm({ initialOrigin }: { initialOrigin?: OriginId | null
               {!autoAdvance && step < STEPS.length && (
                 <motion.button
                   type="button"
-                  onClick={step === 5 ? proceedFromConsent : next}
+                  onClick={step === 6 ? proceedFromConsent : next}
                   disabled={!canContinue}
                   className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                   whileHover={canContinue ? { scale: 1.03 } : undefined}
                   whileTap={canContinue ? { scale: 0.97 } : undefined}
                   transition={{ duration: 0.15 }}
                 >
-                  {step === 5 ? "I Agree — Continue" : "Continue"}
+                  {step === 6 ? "I Agree — Continue" : "Continue"}
                 </motion.button>
               )}
 

@@ -34,9 +34,12 @@ export default async function LoginPage({
       .eq("id", data.user.id)
       .single<{ is_admin: boolean }>();
 
-    // Respect ?next param if it points to a valid internal path
-    if (next && next.startsWith("/")) {
-      redirect(next);
+    // Respect ?next only for safe internal paths — block open-redirect attacks
+    // (e.g. //evil.com or /\evil.com would bypass a simple startsWith("/") check)
+    const SAFE_PREFIXES = ["/dashboard", "/admin", "/book", "/plan", "/pricing"];
+    const isSafeNext = next && /^\/[a-zA-Z0-9/_-]/.test(next) && SAFE_PREFIXES.some((p) => next.startsWith(p));
+    if (isSafeNext) {
+      redirect(next!);
     }
 
     // Role-based default redirect

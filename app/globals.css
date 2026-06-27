@@ -3,59 +3,55 @@
 /*
  * ─────────────────────────────────────────────────────────────────────────────
  *  SCHENGEN JOURNEY  —  PREMIUM DESIGN SYSTEM
- *  Visa consultancy aesthetic: deep navy · royal blue · soft white · gold accent
- *  Inter type · Apple-quality hierarchy · soft professional shadows
+ *  Black · Emerald · Cream  —  Inter type · Apple-quality hierarchy
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 :root {
-  /* ── Real font stacks (from next/font) ────────────────────────────────
-     Use --app-sans / --app-display directly in CSS; Tailwind v4 @theme
-     doesn't emit custom font vars as real CSS properties.
-       --app-sans    = Inter   → body, subheadings, UI labels
-       --app-display = Manrope → display headings (H1–H3)                 */
+  /* ── Real font stacks (from next/font) ────────────────────────────────── */
   --app-sans: var(--ff-inter, -apple-system), -apple-system, BlinkMacSystemFont,
     "Segoe UI", Helvetica, Arial, sans-serif;
-  --app-display: var(--ff-manrope, var(--ff-inter, -apple-system)), -apple-system,
+  --app-display: var(--ff-jakarta, var(--ff-inter, -apple-system)), -apple-system,
     BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 
-  /* ── Navy palette ───────────────────────────────────────────────────── */
-  --navy-950: #040c1a;
-  --navy-900: #081428;
-  --navy-800: #0e1f42;
-  --navy-700: #162d5e;
-  --navy-600: #1e3a8a;
-  --navy-500: #2952b3;
-  --navy-400: #4070cc;
-  --navy-200: #93b4e8;
-  --navy-100: #d0e0f5;
-  --navy-50:  #edf4fd;
+  /* ── Charcoal / Black palette (replaces navy) ─────────────────────────── */
+  --navy-950: #000000;   /* pure black                          */
+  --navy-900: #050505;   /* near black                          */
+  --navy-800: #0a0a0a;   /* very dark charcoal                  */
+  --navy-700: #111111;   /* dark charcoal                       */
+  --navy-600: #226F54;   /* EMERALD — main brand accent         */
+  --navy-500: #1e6349;   /* deeper emerald (gradient end)       */
+  --navy-400: #2d8566;   /* lighter emerald (hover)             */
+  --navy-200: #7ecba8;   /* pale emerald                        */
+  --navy-100: #c4e8d5;   /* very pale emerald tint              */
+  --navy-50:  #eef8f3;   /* barely-green on white               */
 
-  /* ── Gold accent (used sparingly — badges, highlights, CTAs) ─────────── */
-  --gold-500: #c9a84c;
-  --gold-400: #d4b86a;
-  --gold-100: #faf5e4;
+  /* ── Cream accent (replaces gold — badges, badges, highlights, CTAs) ─── */
+  --gold-500: #FFFCF2;   /* cream                               */
+  --gold-400: #EEE8DA;   /* slightly muted cream                */
+  --gold-300: #3aab80;   /* medium emerald (for text accents)   */
+  --gold-100: #e8f5ee;   /* pale green background               */
 
   /* ── Page surfaces ───────────────────────────────────────────────────── */
-  --bg:        #ffffff;
-  --bg-subtle: #f7f9fc;
+  --bg:        #FFFCF2;  /* cream — light section background    */
+  --bg-subtle: #F5F0E8;  /* slightly darker cream               */
   --bg-dark:   var(--navy-900);
 
   /* ── Ink / text ─────────────────────────────────────────────────────── */
-  --ink:       #0a1628;   /* headings on light  */
-  --ink-muted: #4a5568;   /* body paragraphs    */
-  --ink-light: #718096;   /* captions, labels   */
-  --ink-white: #f0f4ff;   /* text on dark       */
+  --ink:       #0a0a0a;   /* headings on cream/light            */
+  --ink-muted: #3d3d3d;   /* body paragraphs                    */
+  --ink-light: #666666;   /* captions, labels                   */
+  --ink-white: #FFFCF2;   /* text on dark backgrounds           */
 
   /* ── Borders ─────────────────────────────────────────────────────────── */
-  --border:       rgba(0, 0, 0, 0.08);
+  --border:       rgba(0, 0, 0, 0.10);
   --border-navy:  rgba(255, 255, 255, 0.10);
 
   /* ── Shadows ─────────────────────────────────────────────────────────── */
-  --shadow-xs:  0 1px 2px rgba(8, 20, 40, 0.06);
-  --shadow-sm:  0 1px 3px rgba(8, 20, 40, 0.06), 0 4px 12px -4px rgba(8, 20, 40, 0.08);
-  --shadow-md:  0 4px 16px -4px rgba(8, 20, 40, 0.12), 0 1px 3px rgba(8, 20, 40, 0.06);
-  --shadow-lg:  0 12px 32px -8px rgba(8, 20, 40, 0.18);
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.10);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.10), 0 4px 12px -4px rgba(0,0,0,0.14);
+  --shadow-md:  0 4px 16px -4px rgba(0,0,0,0.22), 0 1px 3px rgba(0,0,0,0.10);
+  --shadow-lg:  0 12px 32px -8px rgba(0,0,0,0.32);
 
   /* Legacy compat */
   --background:    var(--bg);
@@ -78,13 +74,12 @@
   --font-manrope: var(--app-display);
   --font-mono:    var(--ff-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Tame global font-bold → semibold (600) everywhere */
   --font-weight-normal:   400;
   --font-weight-medium:   500;
   --font-weight-semibold: 600;
   --font-weight-bold:     600;
 
-  /* ── Brand = navy ────────────────────────────────────────────────────── */
+  /* ── Brand = emerald ─────────────────────────────────────────────────── */
   --color-brand-50:  var(--navy-50);
   --color-brand-100: var(--navy-100);
   --color-brand-200: var(--navy-200);
@@ -95,7 +90,7 @@
   --color-brand-800: var(--navy-800);
   --color-brand-900: var(--navy-900);
 
-  /* Gold tokens */
+  /* Cream tokens */
   --color-gold-100: var(--gold-100);
   --color-gold-400: var(--gold-400);
   --color-gold-500: var(--gold-500);
@@ -107,7 +102,6 @@
   --color-ink-muted:     var(--ink-muted);
   --color-ink-light:     var(--ink-light);
 
-  /* Shadow tokens */
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
@@ -115,20 +109,13 @@
 }
 
 html {
-  /* Let Lenis handle scrolling — native smooth-scroll would conflict */
   scroll-behavior: auto;
-  /* Clip horizontal overflow globally so off-screen entrance transforms
-     (AOS fade-left/right, Framer x-offsets, decorative meteors) never widen
-     the layout or create a horizontal scrollbar on mobile/tablet.
-     `clip` (not `hidden`) avoids creating a scroll container, so the sticky
-     navbar keeps working. */
   overflow-x: clip;
   max-width: 100%;
 }
 
 body {
-  /* Near-black slate base — marketing sections paint over it */
-  background-color: #080b14;
+  background-color: #060606;
   color: var(--ink-muted);
   font-family: var(--app-sans);
   overflow-x: clip;
@@ -137,7 +124,6 @@ body {
 
 @layer base {
   body {
-    /* Normal paragraph: Inter 400, 16–18px, line-height 1.7 */
     font-family: var(--app-sans);
     font-weight: 400;
     font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
@@ -147,20 +133,18 @@ body {
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Display headings: Manrope. The precise size scale lives in the
-     .text-h1/.text-h2/.text-h3 utilities (applied to display headings) so
-     that small card/section headings with their own size class are never
-     ballooned. Base only sets family, weight and rhythm. */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--app-display);
     color: var(--ink);
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.15;
     letter-spacing: -0.02em;
   }
 
-  h1 { font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
-  h3, h4 { letter-spacing: -0.015em; }
+  h1 { font-weight: 800; line-height: 1.04; letter-spacing: -0.03em; }
+  h2 { font-weight: 700; letter-spacing: -0.025em; }
+  h3 { font-weight: 700; letter-spacing: -0.018em; }
+  h4 { font-weight: 600; letter-spacing: -0.015em; }
   p { line-height: 1.7; }
 }
 
@@ -170,7 +154,7 @@ body {
  * ─────────────────────────────────────────────────────────────────────────────
  */
 @layer components {
-  /* ── Buttons (round) ────────────────────────────────────────────────── */
+  /* ── Buttons ──────────────────────────────────────────────────────────── */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -186,43 +170,45 @@ body {
   }
   .btn:active { transform: translateY(0.5px); }
 
+  /* Emerald primary button */
   .btn-navy {
-    background: linear-gradient(180deg, var(--navy-500) 0%, var(--navy-700) 100%);
+    background: linear-gradient(180deg, var(--navy-400) 0%, var(--navy-600) 100%);
     color: #fff;
     padding: 0.8rem 1.75rem;
     box-shadow:
-      0 2px 10px rgba(4,12,26,0.38),
+      0 2px 10px rgba(34,111,84,0.38),
       inset 0 1px 0 rgba(255,255,255,0.18),
       inset 0 -1px 0 rgba(0,0,0,0.16);
     transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-navy:hover {
-    background: linear-gradient(180deg, var(--navy-400) 0%, var(--navy-600) 100%);
+    background: linear-gradient(180deg, var(--navy-300, #4dc29a) 0%, var(--navy-400) 100%);
     box-shadow:
-      0 4px 18px rgba(4,12,26,0.48),
+      0 4px 18px rgba(34,111,84,0.52),
       inset 0 1px 0 rgba(255,255,255,0.22),
       inset 0 -1px 0 rgba(0,0,0,0.16);
     transform: translateY(-1px);
   }
   .btn-navy:active { transform: translateY(0) scale(0.98); }
 
+  /* Cream CTA button */
   .btn-gold {
-    background: linear-gradient(180deg, var(--gold-400) 0%, var(--gold-500) 100%);
-    color: var(--navy-900);
+    background: linear-gradient(180deg, var(--gold-500) 0%, var(--gold-400) 100%);
+    color: #0a0a0a;
     padding: 0.8rem 1.75rem;
     font-weight: 600;
     box-shadow:
-      0 2px 12px rgba(201,168,76,0.42),
-      inset 0 1px 0 rgba(255,255,255,0.35),
-      inset 0 -1px 0 rgba(0,0,0,0.08);
+      0 2px 12px rgba(255,252,242,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.60),
+      inset 0 -1px 0 rgba(0,0,0,0.06);
     transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-gold:hover {
-    background: linear-gradient(180deg, #e2c97a 0%, var(--gold-400) 100%);
+    background: linear-gradient(180deg, #ffffff 0%, var(--gold-500) 100%);
     box-shadow:
-      0 4px 22px rgba(201,168,76,0.58),
-      inset 0 1px 0 rgba(255,255,255,0.42),
-      inset 0 -1px 0 rgba(0,0,0,0.08);
+      0 4px 22px rgba(255,252,242,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.70),
+      inset 0 -1px 0 rgba(0,0,0,0.06);
     transform: translateY(-1px);
   }
   .btn-gold:active { transform: translateY(0) scale(0.98); }
@@ -231,51 +217,50 @@ body {
     background: transparent;
     color: var(--navy-600);
     padding: 0.75rem 1.75rem;
-    border: 1.5px solid var(--navy-300, rgba(30,58,138,0.45));
+    border: 1.5px solid rgba(34,111,84,0.45);
     transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-outline-navy:hover {
     background: var(--navy-50);
     border-color: var(--navy-600);
-    box-shadow: 0 2px 8px rgba(30,58,138,0.15);
+    box-shadow: 0 2px 8px rgba(34,111,84,0.18);
   }
 
-  /* Liquid glass ghost button — for dark backgrounds */
   .btn-outline-white {
     background: rgba(255,255,255,0.10);
     backdrop-filter: blur(10px) saturate(1.4);
     -webkit-backdrop-filter: blur(10px) saturate(1.4);
-    color: rgba(240,244,255,0.92);
+    color: rgba(255,252,242,0.92);
     padding: 0.75rem 1.75rem;
-    border: 1px solid rgba(255,255,255,0.28);
+    border: 1px solid rgba(255,252,242,0.28);
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.20),
-      0 2px 10px rgba(4,12,26,0.20);
+      inset 0 1px 0 rgba(255,252,242,0.20),
+      0 2px 10px rgba(0,0,0,0.24);
     transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   }
   .btn-outline-white:hover {
     background: rgba(255,255,255,0.17);
-    border-color: rgba(255,255,255,0.48);
-    color: #fff;
+    border-color: rgba(255,252,242,0.48);
+    color: #FFFCF2;
     box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.28),
-      0 4px 18px rgba(4,12,26,0.28),
-      0 0 0 1px rgba(255,255,255,0.10);
+      inset 0 1px 0 rgba(255,252,242,0.28),
+      0 4px 18px rgba(0,0,0,0.32),
+      0 0 0 1px rgba(255,252,242,0.10);
     transform: translateY(-1px);
   }
   .btn-outline-white:active { transform: translateY(0) scale(0.98); }
 
-  /* ── Cards — liquid glass ────────────────────────────────────────────── */
+  /* ── Cards ────────────────────────────────────────────────────────────── */
   .card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.84) 100%);
+    background: linear-gradient(180deg, rgba(255,252,242,0.96) 0%, rgba(255,252,242,0.86) 100%);
     backdrop-filter: blur(14px) saturate(1.5);
     -webkit-backdrop-filter: blur(14px) saturate(1.5);
     border: 1px solid rgba(255,255,255,0.88);
     border-radius: 1rem;
     box-shadow:
-      0 4px 24px rgba(4,12,26,0.22),
+      0 4px 24px rgba(0,0,0,0.28),
       inset 0 1px 0 rgba(255,255,255,0.95),
-      inset 0 -1px 0 rgba(4,12,26,0.04);
+      inset 0 -1px 0 rgba(0,0,0,0.04);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 border-color 0.28s ease;
@@ -283,27 +268,25 @@ body {
   .card:hover {
     transform: translateY(-5px);
     box-shadow:
-      0 12px 40px rgba(4,12,26,0.30),
+      0 12px 40px rgba(0,0,0,0.36),
       inset 0 1px 0 rgba(255,255,255,0.95);
     border-color: rgba(255,255,255,0.96);
   }
 
-  /* opt-in hover lift for static (non-motion) cards */
   .card-hover:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(4,12,26,0.28), inset 0 1px 0 rgba(255,255,255,0.95);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.95);
   }
 
-  /* Dark glass card — for dark section backgrounds */
   .card-dark {
-    background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+    background: linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.05) 100%);
     backdrop-filter: blur(18px) saturate(1.5);
     -webkit-backdrop-filter: blur(18px) saturate(1.5);
-    border: 1px solid rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 1rem;
     box-shadow:
-      0 8px 32px rgba(4,12,26,0.44),
-      inset 0 1px 0 rgba(255,255,255,0.14);
+      0 8px 32px rgba(0,0,0,0.50),
+      inset 0 1px 0 rgba(255,255,255,0.12);
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 border-color 0.28s ease;
@@ -311,55 +294,51 @@ body {
   .card-dark:hover {
     transform: translateY(-5px);
     box-shadow:
-      0 16px 48px rgba(4,12,26,0.54),
-      inset 0 1px 0 rgba(255,255,255,0.18);
-    border-color: rgba(201,168,76,0.32);
+      0 16px 48px rgba(0,0,0,0.60),
+      inset 0 1px 0 rgba(255,255,255,0.16);
+    border-color: rgba(34,111,84,0.40);
   }
 
-  /* ── Section rhythm — Rich Dark + Slate theme ──────────────────────────
-     Hero / dark sections: near-black slate (#0c0f1a)
-     Mid sections: dark slate (#111827) with subtle grid
-     Light card sections: pure white (#ffffff)
-     Document / CTA: deep navy accent                                      */
+  /* ── Section backgrounds ──────────────────────────────────────────────── */
 
-  /* Pure white — used for Services, Destinations, Testimonials */
+  /* Cream — used for Services, Destinations, Testimonials */
   .section-light {
-    background-color: #ffffff;
+    background-color: #FFFCF2;
     background-image:
-      radial-gradient(rgba(14,31,66,0.025) 1px, transparent 1px),
-      radial-gradient(800px 400px at 90% -5%, rgba(30,58,138,0.04), transparent 55%);
+      radial-gradient(rgba(34,111,84,0.04) 1px, transparent 1px),
+      radial-gradient(800px 400px at 90% -5%, rgba(34,111,84,0.06), transparent 55%);
     background-size: 28px 28px, 100% 100%;
     background-repeat: repeat, no-repeat;
   }
 
-  /* Dark slate — used for HowItWorks, WhyChooseUs, FAQ */
+  /* Near-black charcoal — used for HowItWorks, WhyChooseUs, FAQ */
   .section-subtle {
-    background-color: #111827;
+    background-color: #0d0d0d;
     background-image:
-      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      radial-gradient(900px 500px at 15% 0%, rgba(41,82,179,0.12), transparent 55%),
-      linear-gradient(180deg, #0f1621 0%, #111827 100%);
+      radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      radial-gradient(900px 500px at 15% 0%, rgba(34,111,84,0.14), transparent 55%),
+      linear-gradient(180deg, #0a0a0a 0%, #0d0d0d 100%);
     background-size: 30px 30px, 100% 100%, 100% 100%;
     background-repeat: repeat, no-repeat, no-repeat;
     color: var(--ink-white);
   }
 
-  /* Deeper dark — kept for explicit dark-section use */
+  /* Pure black — deepest dark sections */
   .section-dark {
-    background-color: #0c0f1a;
+    background-color: #050505;
     background-image:
-      radial-gradient(900px 500px at 80% -10%, rgba(41,82,179,0.15), transparent 60%),
-      linear-gradient(180deg, #080b14 0%, #0c0f1a 100%);
+      radial-gradient(900px 500px at 80% -10%, rgba(34,111,84,0.12), transparent 60%),
+      linear-gradient(180deg, #020202 0%, #050505 100%);
     color: var(--ink-white);
   }
 
-  /* Deep navy accent — DocumentChecklist */
+  /* Deep emerald-black — accent sections */
   .section-navy {
-    background-color: #0a1628;
+    background-color: #060f0a;
     background-image:
-      radial-gradient(820px 460px at 15% 0%, rgba(41,82,179,0.24), transparent 58%),
-      radial-gradient(600px 400px at 85% 100%, rgba(201,168,76,0.06), transparent 60%),
-      linear-gradient(180deg, #0d1f3c 0%, #0a1628 100%);
+      radial-gradient(820px 460px at 15% 0%, rgba(34,111,84,0.28), transparent 58%),
+      radial-gradient(600px 400px at 85% 100%, rgba(255,252,242,0.04), transparent 60%),
+      linear-gradient(180deg, #091410 0%, #060f0a 100%);
     color: var(--ink-white);
   }
 
@@ -371,52 +350,52 @@ body {
     .section-pad { padding-top: 7.5rem; padding-bottom: 7.5rem; }
   }
 
-  /* ── Typography scale (semantic utilities) ──────────────────────────────
-     H1/H2/H3 = Manrope · subheading/body/label = Inter.                   */
+  /* ── Typography scale ─────────────────────────────────────────────────── */
   .text-h1 {
     font-family: var(--app-display);
-    font-weight: 700;
-    font-size: clamp(2.25rem, 1.5rem + 4vw, 4.5rem); /* 36 → 72px */
-    line-height: 1.08;
-    letter-spacing: -0.03em;
+    font-weight: 800;
+    font-size: clamp(2.4rem, 1.6rem + 4vw, 4.75rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
     overflow-wrap: break-word;
   }
   .text-h2 {
     font-family: var(--app-display);
-    font-weight: 600;
-    font-size: clamp(1.75rem, 1.3rem + 2.4vw, 3.25rem); /* 28 → 52px */
-    line-height: 1.12;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    font-size: clamp(1.875rem, 1.4rem + 2.4vw, 3.375rem);
+    line-height: 1.10;
+    letter-spacing: -0.025em;
     overflow-wrap: break-word;
   }
   .text-h3 {
     font-family: var(--app-display);
-    font-weight: 600;
-    font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem); /* 24 → 32px */
-    line-height: 1.2;
-    letter-spacing: -0.015em;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+    line-height: 1.18;
+    letter-spacing: -0.018em;
   }
   .text-subhead {
     font-family: var(--app-sans);
-    font-weight: 400;
-    font-size: clamp(1.125rem, 1rem + 0.55vw, 1.375rem); /* 18 → 22px */
-    line-height: 1.6;
+    font-weight: 500;
+    font-size: clamp(1.0625rem, 0.95rem + 0.55vw, 1.3rem);
+    line-height: 1.65;
+    letter-spacing: 0.002em;
   }
   .text-body {
     font-family: var(--app-sans);
     font-weight: 400;
-    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* 16 → 18px */
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
     line-height: 1.7;
   }
   .text-label {
     font-family: var(--app-sans);
     font-weight: 600;
-    font-size: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem); /* 12 → 13px */
+    font-size: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem);
     text-transform: uppercase;
     letter-spacing: 0.12em;
   }
 
-  /* ── Eyebrow labels (small uppercase label, Inter 600, 0.12em) ────────── */
+  /* ── Eyebrow labels ──────────────────────────────────────────────────── */
   .eyebrow {
     display: inline-flex;
     align-items: center;
@@ -426,14 +405,14 @@ body {
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--gold-500);
+    color: var(--navy-600);
   }
   .eyebrow::before, .eyebrow::after {
     content: "";
     display: block;
     width: 2rem;
     height: 1px;
-    background: var(--gold-500);
+    background: var(--navy-600);
     opacity: 0.6;
   }
 
@@ -444,28 +423,28 @@ body {
     background: var(--navy-400);
   }
 
-  /* ── Gold accent text ────────────────────────────────────────────────── */
-  .text-gold { color: var(--gold-500); }
+  /* ── Accent text ─────────────────────────────────────────────────────── */
+  .text-gold { color: var(--navy-600); }
   .text-navy { color: var(--navy-600); }
 
-  /* ── Legacy class aliases — now upgraded to real glass ───────────────── */
+  /* ── Legacy aliases ──────────────────────────────────────────────────── */
   .glass-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.82) 100%);
+    background: linear-gradient(180deg, rgba(255,252,242,0.94) 0%, rgba(255,252,242,0.84) 100%);
     backdrop-filter: blur(14px) saturate(1.5);
     -webkit-backdrop-filter: blur(14px) saturate(1.5);
     border: 1px solid rgba(255,255,255,0.88);
     border-radius: 1rem;
-    box-shadow: 0 4px 24px rgba(4,12,26,0.22), inset 0 1px 0 rgba(255,255,255,0.95);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.95);
   }
   .glass-card-strong {
-    background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(255,252,242,0.90) 100%);
     backdrop-filter: blur(20px) saturate(1.6);
     -webkit-backdrop-filter: blur(20px) saturate(1.6);
     border: 1px solid rgba(255,255,255,0.92);
     border-radius: 1rem;
     box-shadow:
-      0 8px 40px rgba(4,12,26,0.32),
-      0 2px 8px rgba(4,12,26,0.12),
+      0 8px 40px rgba(0,0,0,0.36),
+      0 2px 8px rgba(0,0,0,0.14),
       inset 0 1px 0 rgba(255,255,255,0.98);
   }
   .gradient-text     { color: var(--navy-600); }
@@ -476,24 +455,23 @@ body {
   .app-dark          { background: var(--bg); color: var(--ink-muted); }
   .accent-wash       { background: var(--bg-subtle); }
 
-  /* ── Premium navy page background (used by PremiumPageShell + app pages) ── */
+  /* ── Premium dark background (PremiumPageShell + app pages) ──────────── */
   .premium-bg {
     position: relative;
-    background-color: var(--navy-950);
+    background-color: #000000;
     background-image:
-      radial-gradient(1100px 620px at 82% -8%, rgba(41,82,179,0.20), transparent 60%),
-      radial-gradient(900px 560px at 8% 108%, rgba(201,168,76,0.07), transparent 60%),
-      linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 48%, var(--navy-800) 100%);
+      radial-gradient(1100px 620px at 82% -8%, rgba(34,111,84,0.22), transparent 60%),
+      radial-gradient(900px 560px at 8% 108%, rgba(255,252,242,0.04), transparent 60%),
+      linear-gradient(180deg, #000000 0%, #050505 48%, #0a0a0a 100%);
   }
-  /* Subtle grid overlay layer — sits behind content, never intercepts clicks. */
   .premium-grid {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
     background-image:
-      linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
     background-size: 64px 64px;
     -webkit-mask-image: radial-gradient(120% 90% at 50% 0%, #000 35%, transparent 85%);
             mask-image: radial-gradient(120% 90% at 50% 0%, #000 35%, transparent 85%);
@@ -502,11 +480,10 @@ body {
 
 /*
  * ─────────────────────────────────────────────────────────────────────────────
- *  MAGIC UI — premium keyframe animations
+ *  KEYFRAME ANIMATIONS
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-/* Meteor shooting-star sweep */
 @keyframes meteor {
   0%   { transform: rotate(215deg) translateX(0);    opacity: 1; }
   70%  { opacity: 1; }
@@ -514,7 +491,6 @@ body {
 }
 .animate-meteor { animation: meteor linear infinite; }
 
-/* Rotating border beam */
 @keyframes border-beam-rotate {
   0%   { --angle: 0deg; }
   100% { --angle: 360deg; }
@@ -525,7 +501,6 @@ body {
   inherits: false;
 }
 
-/* Shimmer button sweep */
 @keyframes shimmer-sweep {
   0%   { transform: translateX(-100%) skewX(-20deg); }
   100% { transform: translateX(250%)  skewX(-20deg); }
@@ -534,7 +509,6 @@ body {
   animation: shimmer-sweep 2.4s ease-in-out infinite;
 }
 
-/* Gradient text scroll */
 @keyframes gradient-text {
   0%   { background-position: 0%   center; }
   100% { background-position: 200% center; }
@@ -543,31 +517,24 @@ body {
   animation: gradient-text 4s linear infinite;
 }
 
-/* Pulse glow */
+/* Emerald pulse glow */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(201,168,76,0.3); }
-  50%       { box-shadow: 0 0 40px rgba(201,168,76,0.6), 0 0 80px rgba(201,168,76,0.2); }
+  0%, 100% { box-shadow: 0 0 20px rgba(34,111,84,0.30); }
+  50%       { box-shadow: 0 0 40px rgba(34,111,84,0.55), 0 0 80px rgba(34,111,84,0.18); }
 }
 .animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
 
-/* Float up-down */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-10px); }
 }
 .animate-float { animation: float 4s ease-in-out infinite; }
 
-/* Spotlight sweep for hero */
 @keyframes spotlight {
   0%   { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
   100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
 }
 
-/*
- * ─────────────────────────────────────────────────────────────────────────────
- *  MOTION  —  lightweight entrance animations (Framer handles the rest)
- * ─────────────────────────────────────────────────────────────────────────────
- */
 @keyframes sj-fade-up {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -578,13 +545,13 @@ body {
   to   { opacity: 1; }
 }
 
-/* ── Navbar sliding underline ───────────────────────────────────────────── */
+/* ── Navbar underline ───────────────────────────────────────────────────── */
 .nav-link-underline {
   position: relative;
-  color: rgba(240,244,255,0.72);
+  color: rgba(255,252,242,0.72);
   transition: color 0.18s ease;
 }
-.nav-link-underline:hover { color: #ffffff; }
+.nav-link-underline:hover { color: #FFFCF2; }
 .nav-link-underline::after {
   content: "";
   position: absolute;
@@ -592,7 +559,7 @@ body {
   left: 0;
   width: 100%;
   height: 1.5px;
-  background: var(--gold-500);
+  background: var(--navy-600);
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.28s cubic-bezier(0.22,1,0.36,1);
@@ -603,15 +570,15 @@ body {
   transform-origin: left;
 }
 
-/* ── Input focus ring animation ─────────────────────────────────────────── */
+/* ── Input focus ring ───────────────────────────────────────────────────── */
 @keyframes focus-ring-in {
-  0%   { box-shadow: 0 0 0 0 rgba(30,58,138,0.35); }
-  60%  { box-shadow: 0 0 0 4px rgba(30,58,138,0.18); }
-  100% { box-shadow: 0 0 0 3px rgba(30,58,138,0.10); }
+  0%   { box-shadow: 0 0 0 0 rgba(34,111,84,0.35); }
+  60%  { box-shadow: 0 0 0 4px rgba(34,111,84,0.18); }
+  100% { box-shadow: 0 0 0 3px rgba(34,111,84,0.10); }
 }
 .input-premium:focus {
   outline: none;
-  border-color: var(--navy-500) !important;
+  border-color: var(--navy-600) !important;
   animation: focus-ring-in 0.3s ease forwards;
 }
 .input-premium.input-error:focus {
@@ -633,33 +600,31 @@ body {
 
 /* ── Selected card border glow ──────────────────────────────────────────── */
 @keyframes border-glow {
-  0%,100% { box-shadow: 0 0 0 0 rgba(30,58,138,0.0), 0 8px 24px -6px rgba(30,58,138,0.22); }
-  50%     { box-shadow: 0 0 0 4px rgba(30,58,138,0.14), 0 8px 24px -6px rgba(30,58,138,0.30); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(34,111,84,0.0), 0 8px 24px -6px rgba(34,111,84,0.20); }
+  50%     { box-shadow: 0 0 0 4px rgba(34,111,84,0.16), 0 8px 24px -6px rgba(34,111,84,0.30); }
 }
 .card-selected-glow { animation: border-glow 1.8s ease-in-out infinite; }
 
 /* ── Recommended plan pulse ─────────────────────────────────────────────── */
 @keyframes recommended-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.0), 0 16px 48px -12px rgba(8,20,40,0.35); }
-  50%     { box-shadow: 0 0 0 5px rgba(201,168,76,0.12), 0 16px 48px -12px rgba(8,20,40,0.45); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(34,111,84,0.0), 0 16px 48px -12px rgba(0,0,0,0.40); }
+  50%     { box-shadow: 0 0 0 5px rgba(34,111,84,0.18), 0 16px 48px -12px rgba(0,0,0,0.50); }
 }
 .card-recommended-pulse { animation: recommended-pulse 2.4s ease-in-out infinite; }
 
-/* ── Page transition blur ───────────────────────────────────────────────── */
+/* ── Page transition ────────────────────────────────────────────────────── */
 @keyframes page-enter {
   from { opacity: 0; transform: translateY(14px); filter: blur(4px); }
   to   { opacity: 1; transform: translateY(0);    filter: blur(0px); }
 }
 .page-enter { animation: page-enter 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
 
-/* ── Timeline line draw (GSAP targets this) ─────────────────────────────── */
 .timeline-line { transform-origin: top center; }
 
 .animate-page-in {
   animation: sj-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Staggered card reveal — apply to a grid/stack; children fade up in sequence. */
 .reveal-stagger > * {
   animation: sj-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -673,40 +638,35 @@ body {
 /*
  * ─────────────────────────────────────────────────────────────────────────────
  *  LIQUID GLASS DESIGN SYSTEM
- *  Apple-inspired frosted glass surfaces — designed for navy/dark backgrounds.
- *  Every surface uses backdrop-filter + translucent fill + inner top highlight.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-/* ── Tokens (added to root so any component can reference them) ── */
 :root {
-  /* Dark context glass — white light on dark navy */
-  --lg-dark-bg:          rgba(255, 255, 255, 0.08);
-  --lg-dark-bg-hover:    rgba(255, 255, 255, 0.13);
-  --lg-dark-border:      rgba(255, 255, 255, 0.13);
-  --lg-dark-border-hover:rgba(255, 255, 255, 0.24);
-  --lg-dark-highlight:   rgba(255, 255, 255, 0.14); /* top gloss line */
-  --lg-dark-shadow:      0 8px 32px rgba(4,12,26,0.44), inset 0 1px 0 rgba(255,255,255,0.14);
-  --lg-dark-shadow-hover:0 16px 48px rgba(4,12,26,0.56), inset 0 1px 0 rgba(255,255,255,0.18);
-  --lg-dark-blur:        blur(18px) saturate(1.5);
+  /* Dark glass — white light on black */
+  --lg-dark-bg:           rgba(255, 255, 255, 0.07);
+  --lg-dark-bg-hover:     rgba(255, 255, 255, 0.12);
+  --lg-dark-border:       rgba(255, 255, 255, 0.11);
+  --lg-dark-border-hover: rgba(255, 255, 255, 0.22);
+  --lg-dark-highlight:    rgba(255, 255, 255, 0.12);
+  --lg-dark-shadow:       0 8px 32px rgba(0,0,0,0.56), inset 0 1px 0 rgba(255,255,255,0.12);
+  --lg-dark-shadow-hover: 0 16px 48px rgba(0,0,0,0.68), inset 0 1px 0 rgba(255,255,255,0.16);
+  --lg-dark-blur:         blur(18px) saturate(1.5);
 
-  /* Light context glass — frosted white panel */
-  --lg-light-bg:         linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.85) 100%);
-  --lg-light-border:     rgba(255, 255, 255, 0.90);
-  --lg-light-highlight:  rgba(255, 255, 255, 0.96); /* inset top line */
-  --lg-light-shadow:     0 8px 40px rgba(4,12,26,0.32), inset 0 1px 0 rgba(255,255,255,0.95);
-  --lg-light-shadow-hover:0 20px 60px rgba(4,12,26,0.42), inset 0 1px 0 rgba(255,255,255,0.95);
-  --lg-light-blur:       blur(20px) saturate(1.6);
+  /* Light glass — frosted cream panel */
+  --lg-light-bg:          linear-gradient(180deg, rgba(255,252,242,0.96) 0%, rgba(255,252,242,0.86) 100%);
+  --lg-light-border:      rgba(255, 255, 255, 0.90);
+  --lg-light-highlight:   rgba(255, 255, 255, 0.96);
+  --lg-light-shadow:      0 8px 40px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.95);
+  --lg-light-shadow-hover:0 20px 60px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.95);
+  --lg-light-blur:        blur(20px) saturate(1.6);
 
-  /* Gold glow accent */
-  --lg-gold-glow:   0 0 0 1px rgba(201,168,76,0.30), 0 0 24px rgba(201,168,76,0.14);
-  /* Navy glow accent */
-  --lg-navy-glow:   0 0 0 1px rgba(64,112,204,0.28), 0 0 20px rgba(30,58,138,0.16);
+  /* Emerald glow */
+  --lg-gold-glow:  0 0 0 1px rgba(34,111,84,0.30), 0 0 24px rgba(34,111,84,0.14);
+  --lg-navy-glow:  0 0 0 1px rgba(34,111,84,0.28), 0 0 20px rgba(34,111,84,0.16);
 }
 
-/* ── Dark glass surface — for cards on navy/dark backgrounds ── */
 .glass-dark {
-  background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+  background: linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.05) 100%);
   backdrop-filter: var(--lg-dark-blur);
   -webkit-backdrop-filter: var(--lg-dark-blur);
   border: 1px solid var(--lg-dark-border);
@@ -721,7 +681,6 @@ body {
   box-shadow: var(--lg-dark-shadow-hover);
 }
 
-/* ── Light glass surface — frosted white panel on dark bg ── */
 .glass-light {
   background: var(--lg-light-bg);
   backdrop-filter: var(--lg-light-blur);
@@ -738,100 +697,95 @@ body {
   border-color: rgba(255,255,255,0.96);
 }
 
-/* ── Glass panel — larger frosted container (booking form, modals) ── */
 .glass-panel {
   background: var(--lg-light-bg);
   backdrop-filter: blur(24px) saturate(1.7);
   -webkit-backdrop-filter: blur(24px) saturate(1.7);
   border: 1px solid var(--lg-light-border);
   box-shadow:
-    0 32px 80px rgba(4,12,26,0.45),
-    0 8px 24px rgba(4,12,26,0.22),
+    0 32px 80px rgba(0,0,0,0.52),
+    0 8px 24px rgba(0,0,0,0.28),
     inset 0 1px 0 rgba(255,255,255,0.96);
 }
 
-/* ── Navbar glass — sticky translucent header ── */
 .glass-navbar {
-  background: rgba(6, 14, 28, 0.52);
+  background: rgba(0, 0, 0, 0.60);
   backdrop-filter: blur(22px) saturate(1.8);
   -webkit-backdrop-filter: blur(22px) saturate(1.8);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.06),
-    0 4px 32px rgba(4,12,26,0.24);
+    0 1px 0 rgba(255,255,255,0.05),
+    0 4px 32px rgba(0,0,0,0.30);
 }
 
-/* ── Sidebar glass (dashboard) ── */
 .glass-sidebar {
-  background: rgba(6, 14, 28, 0.68);
+  background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(20px) saturate(1.6);
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
-  border-right: 1px solid rgba(255,255,255,0.08);
+  border-right: 1px solid rgba(255,255,255,0.07);
   box-shadow: inset -1px 0 0 rgba(255,255,255,0.04);
 }
 
-/* ── Input: light glass ── */
 .glass-input {
   background: rgba(255,255,255,0.88);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.80);
-  box-shadow: inset 0 1px 3px rgba(4,12,26,0.06), 0 1px 0 rgba(255,255,255,0.90);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08), 0 1px 0 rgba(255,255,255,0.90);
   color: var(--ink);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 .glass-input:focus {
   outline: none;
   background: rgba(255,255,255,0.96);
-  border-color: rgba(64,112,204,0.55);
+  border-color: rgba(34,111,84,0.60);
   box-shadow:
-    0 0 0 3px rgba(30,58,138,0.14),
-    inset 0 1px 3px rgba(4,12,26,0.04),
+    0 0 0 3px rgba(34,111,84,0.14),
+    inset 0 1px 3px rgba(0,0,0,0.04),
     0 1px 0 rgba(255,255,255,0.95);
 }
-.glass-input::placeholder { color: rgba(10,22,40,0.38); }
+.glass-input::placeholder { color: rgba(10,10,10,0.36); }
 
-/* ── Pricing card — deep navy glass (popular variant) ── */
+/* Pricing card — popular */
 .glass-pricing-popular {
-  background: linear-gradient(160deg, rgba(14,31,66,0.92) 0%, rgba(6,14,28,0.90) 100%);
+  background: linear-gradient(160deg, rgba(22,50,36,0.92) 0%, rgba(5,10,8,0.90) 100%);
   backdrop-filter: blur(22px) saturate(1.4);
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
-  border: 1.5px solid rgba(201,168,76,0.38);
+  border: 1.5px solid rgba(34,111,84,0.50);
   box-shadow:
-    0 16px 56px rgba(4,12,26,0.58),
-    0 0 0 1px rgba(201,168,76,0.14),
-    inset 0 1px 0 rgba(255,255,255,0.12);
+    0 16px 56px rgba(0,0,0,0.64),
+    0 0 0 1px rgba(34,111,84,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.10);
 }
 
-/* ── Selectable card — light glass on dark form bg ── */
 .glass-selectable {
-  background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.82) 100%);
+  background: linear-gradient(180deg, rgba(255,252,242,0.94) 0%, rgba(255,252,242,0.84) 100%);
   backdrop-filter: blur(12px) saturate(1.4);
   -webkit-backdrop-filter: blur(12px) saturate(1.4);
   border: 1.5px solid rgba(255,255,255,0.78);
   box-shadow:
-    0 4px 20px rgba(4,12,26,0.22),
+    0 4px 20px rgba(0,0,0,0.26),
     inset 0 1px 0 rgba(255,255,255,0.95);
 }
 .glass-selectable-selected {
-  background: linear-gradient(180deg, rgba(30,58,138,0.22) 0%, rgba(14,31,66,0.18) 100%);
+  background: linear-gradient(180deg, rgba(34,111,84,0.18) 0%, rgba(20,70,50,0.14) 100%);
   backdrop-filter: blur(14px) saturate(1.4);
   -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  border: 2px solid rgba(64,112,204,0.55);
+  border: 2px solid rgba(34,111,84,0.60);
   box-shadow:
-    0 0 0 3px rgba(30,58,138,0.14),
-    0 8px 28px rgba(4,12,26,0.28),
-    inset 0 1px 0 rgba(255,255,255,0.20);
+    0 0 0 3px rgba(34,111,84,0.14),
+    0 8px 28px rgba(0,0,0,0.32),
+    inset 0 1px 0 rgba(255,255,255,0.18);
 }
 
-/* ── Gold glow shimmer keyframe ── */
+/* ── Emerald glow shimmer ── */
 @keyframes glass-gold-pulse {
-  0%,100% { box-shadow: 0 16px 56px rgba(4,12,26,0.58), 0 0 0 1px rgba(201,168,76,0.14), inset 0 1px 0 rgba(255,255,255,0.12); }
-  50%     { box-shadow: 0 20px 64px rgba(4,12,26,0.62), 0 0 0 1px rgba(201,168,76,0.28), 0 0 28px rgba(201,168,76,0.12), inset 0 1px 0 rgba(255,255,255,0.15); }
+  0%,100% { box-shadow: 0 16px 56px rgba(0,0,0,0.64), 0 0 0 1px rgba(34,111,84,0.18), inset 0 1px 0 rgba(255,255,255,0.10); }
+  50%     { box-shadow: 0 20px 64px rgba(0,0,0,0.68), 0 0 0 1px rgba(34,111,84,0.35), 0 0 28px rgba(34,111,84,0.14), inset 0 1px 0 rgba(255,255,255,0.13); }
 }
 .glass-gold-pulse { animation: glass-gold-pulse 2.6s ease-in-out infinite; }
 
-/* ── Accessibility: honour the user's reduced-motion preference ─────────── */
+/* ── Accessibility ──────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -845,67 +799,51 @@ body {
 
 /*
  * ─────────────────────────────────────────────────────────────────────────────
- *  THEME SYSTEM  —  night (dark) / day (light)
- *
- *  Strategy: dark sections (section-subtle / section-dark / section-navy) stay
- *  dark in both modes — their white text is only readable on dark backgrounds.
- *  "Day mode" affects the navbar chrome, mobile menu, and section-light areas.
+ *  THEME SYSTEM
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-/* ── Mobile nav link: CSS-variable-driven theming ── */
 .mobile-nav-link {
-  color: var(--menu-text, rgba(240,244,255,0.70));
+  color: var(--menu-text, rgba(255,252,242,0.70));
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .mobile-nav-link:hover {
   background: var(--menu-item-hover, rgba(255,255,255,0.06));
-  color: var(--menu-text-strong, rgba(240,244,255,0.92));
+  color: var(--menu-text-strong, rgba(255,252,242,0.92));
 }
 .mobile-nav-link[data-active="true"] {
   background: var(--menu-item-active, rgba(255,255,255,0.09));
-  color: var(--menu-text-strong, rgba(240,244,255,0.92));
+  color: var(--menu-text-strong, rgba(255,252,242,0.92));
 }
 
-/* ── Night mode tokens (default — no class required) ── */
 :root {
-  --menu-text:        rgba(240,244,255,0.70);
-  --menu-text-strong: rgba(240,244,255,0.92);
+  --menu-text:        rgba(255,252,242,0.70);
+  --menu-text-strong: rgba(255,252,242,0.92);
   --menu-item-hover:  rgba(255,255,255,0.06);
   --menu-item-active: rgba(255,255,255,0.09);
 }
 
-/* ── Day mode overrides ── */
 html.light {
-  --menu-text:        rgba(10,22,40,0.65);
-  --menu-text-strong: rgba(10,22,40,0.90);
-  --menu-item-hover:  rgba(10,22,40,0.04);
-  --menu-item-active: rgba(30,58,138,0.08);
+  --menu-text:        rgba(10,10,10,0.65);
+  --menu-text-strong: rgba(10,10,10,0.90);
+  --menu-item-hover:  rgba(10,10,10,0.04);
+  --menu-item-active: rgba(34,111,84,0.10);
 }
 
-/* Body fill between dark sections lightens slightly */
 html.light body {
-  background-color: #f0f5ff;
+  background-color: #F5F0E8;
 }
 
-/* section-light (Services, Destinations) gets a cleaner white in day mode */
 html.light .section-light {
-  background-color: #ffffff;
-  background-image: radial-gradient(rgba(14,31,66,0.018) 1px, transparent 1px);
+  background-color: #FFFCF2;
+  background-image: radial-gradient(rgba(34,111,84,0.03) 1px, transparent 1px);
 }
 
-/* Dark sections STAY DARK so white text remains readable */
-/* (section-subtle, section-dark, section-navy — no override needed) */
-
-/* ── Navbar: white chrome in day mode ── */
-/* NavbarScrollEffect.tsx handles this via inline styles + MutationObserver  */
-/* so no CSS rule needed here — the JS already sets the correct bg in light   */
-/* mode. The nav-link colour and logo text do need CSS overrides though:      */
 html.light .nav-link-underline {
-  color: rgba(10,22,40,0.65);
+  color: rgba(10,10,10,0.65);
 }
 html.light .nav-link-underline:hover {
-  color: var(--navy-700);
+  color: var(--navy-600);
 }
 html.light .nav-link-underline::after {
   background: var(--navy-600);
@@ -914,7 +852,7 @@ html.light [data-navbar] .text-white {
   color: var(--ink) !important;
 }
 html.light [data-navbar] .btn-outline-white {
-  background: rgba(10,22,40,0.06) !important;
+  background: rgba(10,10,10,0.06) !important;
   color: var(--ink) !important;
-  border-color: rgba(10,22,40,0.18) !important;
+  border-color: rgba(10,10,10,0.18) !important;
 }

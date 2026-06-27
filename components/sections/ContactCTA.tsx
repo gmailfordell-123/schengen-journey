@@ -25,12 +25,12 @@ export function ContactCTA() {
             <Meteors number={14} />
 
             {/* Animated border */}
-            <BorderBeam duration={7} colorFrom="#c9a84c" colorTo="#4070cc" />
+            <BorderBeam duration={7} colorFrom="#226F54" colorTo="#3aab80" />
 
             {/* Glow orbs */}
             <div
               className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full opacity-20"
-              style={{ background: "radial-gradient(circle, var(--gold-500) 0%, transparent 70%)" }}
+              style={{ background: "radial-gradient(circle, var(--navy-600) 0%, transparent 70%)" }}
             />
             <div
               className="pointer-events-none absolute bottom-0 right-0 h-48 w-48 rounded-full opacity-10"

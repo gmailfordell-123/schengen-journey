@@ -54,7 +54,7 @@ export function DocumentChecklist() {
         <div className="grid gap-14 lg:grid-cols-2 items-start">
 
           {/* Left: heading */}
-          <div data-aos="fade-right">
+          <div>
             <p className="eyebrow mb-5" style={{ color: "var(--gold-500)" }}>
               <span className="h-px w-6 inline-block rounded" style={{ background: "var(--gold-500)", verticalAlign: "middle", marginRight: "0.75rem" }} />
               Document Checklist
@@ -80,13 +80,13 @@ export function DocumentChecklist() {
             <div
               className="mt-8 rounded-2xl p-6"
               style={{
-                background: "rgba(201,168,76,0.08)",
-                border: "1px solid rgba(201,168,76,0.20)",
+                background: "rgba(34,111,84,0.08)",
+                border: "1px solid rgba(34,111,84,0.20)",
               }}
             >
               <p
                 className="text-sm font-semibold mb-2"
-                style={{ color: "var(--gold-400)" }}
+                style={{ color: "#3aab80" }}
               >
                 Our document review service
               </p>
@@ -99,7 +99,7 @@ export function DocumentChecklist() {
           </div>
 
           {/* Right: checklist */}
-          <div data-aos="fade-left" className="space-y-3">
+          <div className="space-y-3">
             {checklist.map((doc, i) => (
               <motion.div
                 key={doc.item}
@@ -116,9 +116,9 @@ export function DocumentChecklist() {
                 <div
                   className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full mt-0.5"
                   style={{
-                    background: "rgba(201,168,76,0.15)",
-                    color: "var(--gold-400)",
-                    border: "1px solid rgba(201,168,76,0.30)",
+                    background: "rgba(34,111,84,0.15)",
+                    color: "#3aab80",
+                    border: "1px solid rgba(34,111,84,0.30)",
                   }}
                 >
                   <Check size={12} strokeWidth={3} />

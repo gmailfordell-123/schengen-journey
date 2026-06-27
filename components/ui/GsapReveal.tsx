@@ -4,8 +4,6 @@ import { useRef, useEffect, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
-
 /**
  * GSAP ScrollTrigger reveal. Replaces BlurFade for premium section entrances.
  * Triggers when the element enters the viewport (once).
@@ -29,6 +27,7 @@ export function GsapReveal({
 
   useEffect(() => {
     if (!ref.current) return;
+    gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -80,6 +79,7 @@ export function GsapStagger({
 
   useEffect(() => {
     if (!ref.current) return;
+    gsap.registerPlugin(ScrollTrigger);
 
     const items = Array.from(ref.current.children);
     if (!items.length) return;

@@ -1,37 +1,24 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, Fragment_Mono } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-/**
- * Premium type system:
- *   - Manrope       → display headings (H1–H3)
- *   - Inter         → body, subheadings, UI labels
- *   - Fragment Mono → monospace accents (reference numbers, figures)
- * Loaded via next/font and exposed as CSS variables that globals.css maps
- * onto the Tailwind font tokens.
- */
 const inter = Inter({
   variable: "--ff-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
+  preload: true,
 });
 
-const manrope = Manrope({
-  variable: "--ff-manrope",
+const jakartaSans = Plus_Jakarta_Sans({
+  variable: "--ff-jakarta",
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],
   display: "swap",
-});
-
-const fragmentMono = Fragment_Mono({
-  variable: "--ff-mono",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -51,7 +38,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${manrope.variable} ${fragmentMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${jakartaSans.variable} h-full antialiased`}
     >
       <head>
         {/* Blocking script: applies saved theme class before first paint — prevents flash */}

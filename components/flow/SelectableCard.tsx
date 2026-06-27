@@ -64,15 +64,15 @@ export function SelectableCard({
         scale: scaleS,
         transformStyle: "preserve-3d",
         background: selected
-          ? "linear-gradient(180deg, rgba(30,58,138,0.22) 0%, rgba(14,31,66,0.18) 100%)"
+          ? "linear-gradient(180deg, rgba(34,111,84,0.14) 0%, rgba(10,40,26,0.12) 100%)"
           : "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.82) 100%)",
         backdropFilter: "blur(14px) saturate(1.4)",
         WebkitBackdropFilter: "blur(14px) saturate(1.4)",
         border: selected
-          ? "2px solid rgba(64,112,204,0.55)"
+          ? "2px solid rgba(34,111,84,0.55)"
           : "1.5px solid rgba(255,255,255,0.78)",
         boxShadow: selected
-          ? "0 0 0 3px rgba(30,58,138,0.14), 0 8px 28px rgba(4,12,26,0.28), inset 0 1px 0 rgba(255,255,255,0.20)"
+          ? "0 0 0 3px rgba(34,111,84,0.14), 0 8px 28px rgba(4,12,26,0.28), inset 0 1px 0 rgba(255,255,255,0.20)"
           : "0 4px 20px rgba(4,12,26,0.22), inset 0 1px 0 rgba(255,255,255,0.95)",
       }}
       className={`group relative flex w-full items-center gap-4 rounded-2xl p-5 text-left ${className}`}
@@ -89,7 +89,7 @@ export function SelectableCard({
             transition={{ duration: 0.2 }}
             style={{
               border: "2px solid var(--navy-600)",
-              boxShadow: "inset 0 0 0 1px rgba(30,58,138,0.06)",
+              boxShadow: "inset 0 0 0 1px rgba(34,111,84,0.08)",
             }}
           />
         )}
@@ -101,8 +101,8 @@ export function SelectableCard({
           transition={{ type: "spring", stiffness: 340, damping: 22 }}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200"
           style={{
-            background: selected ? "rgba(30,58,138,0.22)" : "rgba(255,255,255,0.60)",
-            color: selected ? "rgba(200,218,255,0.95)" : "#475569",
+            background: selected ? "rgba(34,111,84,0.18)" : "rgba(255,255,255,0.60)",
+            color: selected ? "#3aab80" : "#475569",
           }}
           aria-hidden
         >

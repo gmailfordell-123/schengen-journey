@@ -41,7 +41,7 @@ export function PremiumPageShell({
           height: "560px",
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(41,82,179,0.22) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(34,111,84,0.22) 0%, transparent 70%)",
         }}
       />
       <div
@@ -54,7 +54,7 @@ export function PremiumPageShell({
           height: "520px",
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(201,168,76,0.10) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(34,111,84,0.10) 0%, transparent 70%)",
         }}
       />
 

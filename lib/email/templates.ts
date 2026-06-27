@@ -19,7 +19,7 @@ function layout(content: string) {
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
         <!-- Header -->
         <tr>
-          <td style="background:#2563eb;border-radius:12px 12px 0 0;padding:24px 32px;">
+          <td style="background:#226F54;border-radius:12px 12px 0 0;padding:24px 32px;">
             <span style="color:#fff;font-size:18px;font-weight:700;letter-spacing:-0.3px;">
               SJ &nbsp; Schengen Journey
             </span>
@@ -94,7 +94,7 @@ export function bookingConfirmationHtml(data: {
         Keep your reference number safe — you'll need it to track your application.
       </p>
       <a href="https://schengenjourney.com/dashboard"
-         style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">
+         style="display:inline-block;background:#226F54;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">
         View your dashboard
       </a>
     </div>
@@ -187,7 +187,7 @@ export function statusUpdateHtml(data: {
 
     <div style="margin-top:28px;padding-top:24px;border-top:1px solid #f1f5f9;">
       <a href="https://schengenjourney.com/dashboard/status"
-         style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">
+         style="display:inline-block;background:#226F54;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">
         Track your application
       </a>
     </div>

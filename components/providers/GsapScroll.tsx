@@ -131,7 +131,7 @@ export function GsapScroll() {
       <div
         ref={barRef}
         className="h-full origin-left scale-x-0"
-        style={{ background: "linear-gradient(90deg, var(--navy-600), var(--gold-500))" }}
+        style={{ background: "linear-gradient(90deg, var(--navy-600), #3aab80)" }}
       />
     </div>
   );

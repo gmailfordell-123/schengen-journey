@@ -159,9 +159,9 @@ export function MobileMenu({
                       href="/dashboard"
                       className="flex w-full items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
                       style={{
-                        background: isLight ? "rgba(30,58,138,0.06)" : "rgba(255,255,255,0.07)",
+                        background: isLight ? "rgba(34,111,84,0.06)" : "rgba(255,255,255,0.07)",
                         color: isLight ? "var(--navy-700)" : "rgba(240,244,255,0.82)",
-                        border: `1px solid ${isLight ? "rgba(30,58,138,0.12)" : "rgba(255,255,255,0.10)"}`,
+                        border: `1px solid ${isLight ? "rgba(34,111,84,0.12)" : "rgba(255,255,255,0.10)"}`,
                       }}
                     >
                       <LayoutDashboard size={15} />
@@ -188,9 +188,9 @@ export function MobileMenu({
                       href="/login"
                       className="flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
                       style={{
-                        background: isLight ? "rgba(30,58,138,0.06)" : "rgba(255,255,255,0.07)",
+                        background: isLight ? "rgba(34,111,84,0.06)" : "rgba(255,255,255,0.07)",
                         color: isLight ? "var(--navy-700)" : "rgba(240,244,255,0.82)",
-                        border: `1px solid ${isLight ? "rgba(30,58,138,0.14)" : "rgba(255,255,255,0.10)"}`,
+                        border: `1px solid ${isLight ? "rgba(34,111,84,0.14)" : "rgba(255,255,255,0.10)"}`,
                       }}
                     >
                       <LogIn size={15} />
@@ -202,7 +202,7 @@ export function MobileMenu({
                       style={{
                         background: "linear-gradient(180deg, var(--gold-400) 0%, var(--gold-500) 100%)",
                         color: "var(--navy-900)",
-                        boxShadow: "0 2px 14px rgba(201,168,76,0.38)",
+                        boxShadow: "0 2px 14px rgba(34,111,84,0.38)",
                       }}
                     >
                       <Calendar size={15} />

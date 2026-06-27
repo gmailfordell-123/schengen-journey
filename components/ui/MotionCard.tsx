@@ -28,7 +28,7 @@ export const hoverVariants = {
   hover: {
     y: -6,
     boxShadow: "0 8px 32px -6px rgba(8,20,40,0.18), 0 2px 8px rgba(8,20,40,0.08)",
-    borderColor: "rgba(30,58,138,0.22)",
+    borderColor: "rgba(34,111,84,0.30)",
   },
 };
 
@@ -68,8 +68,8 @@ export function MotionCard({
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{
           boxShadow: dark
-            ? "inset 0 0 0 1px rgba(201,168,76,0.35)"
-            : "inset 0 0 0 1.5px rgba(30,58,138,0.20)",
+            ? "inset 0 0 0 1px rgba(34,111,84,0.35)"
+            : "inset 0 0 0 1.5px rgba(34,111,84,0.20)",
         }}
       />
       {children}

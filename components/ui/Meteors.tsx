@@ -31,8 +31,8 @@ export function Meteors({ number = 18 }: { number?: number }) {
             animationDuration: m.duration,
             width: `${m.size}px`,
             height: "1px",
-            background: `linear-gradient(90deg, rgba(201,168,76,0.7), transparent)`,
-            boxShadow: "0 0 6px 1px rgba(201,168,76,0.3)",
+            background: `linear-gradient(90deg, rgba(34,111,84,0.7), transparent)`,
+            boxShadow: "0 0 6px 1px rgba(34,111,84,0.3)",
           }}
         />
       ))}

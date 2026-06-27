@@ -148,7 +148,7 @@ export function Destinations() {
                   <motion.div
                     layoutId="region-tint"
                     className="absolute inset-0"
-                    style={{ background: "rgba(201,168,76,0.08)" }}
+                    style={{ background: "rgba(34,111,84,0.10)" }}
                     transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}

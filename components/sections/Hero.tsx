@@ -46,7 +46,7 @@ export function Hero() {
     <section
       className="relative overflow-hidden"
       style={{
-        background: "linear-gradient(160deg, #060912 0%, #0d1525 55%, #0f1d3a 100%)",
+        background: "linear-gradient(160deg, #000000 0%, #050505 55%, #060f0a 100%)",
         minHeight: "92vh",
         display: "flex",
         alignItems: "center",
@@ -60,9 +60,9 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 transition-none"
         style={{
           backgroundImage: `
-            radial-gradient(circle at 20% 50%, rgba(30,58,138,0.42) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(14,31,66,0.60) 0%, transparent 40%),
-            radial-gradient(circle at 60% 80%, rgba(70, 126, 155, 0.07) 0%, transparent 35%)
+            radial-gradient(circle at 20% 50%, rgba(34,111,84,0.35) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(17,60,44,0.55) 0%, transparent 40%),
+            radial-gradient(circle at 60% 80%, rgba(34,111,84,0.08) 0%, transparent 35%)
           `,
           backgroundSize: "100% 100%",
           willChange: "background-position",
@@ -85,7 +85,7 @@ export function Hero() {
       <div
         className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full opacity-[0.06]"
         style={{
-          background: "radial-gradient(circle, var(--gold-500) 0%, transparent 70%)",
+          background: "radial-gradient(circle, var(--navy-600) 0%, transparent 70%)",
           animation: "spotlight 2s ease-out forwards",
         }}
       />

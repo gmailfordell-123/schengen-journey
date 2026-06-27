@@ -192,7 +192,7 @@ export default function StatusPage() {
                 background: "linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.10) 100%)",
                 backdropFilter: "blur(18px) saturate(1.5)",
                 WebkitBackdropFilter: "blur(18px) saturate(1.5)",
-                border: "1.5px solid rgba(201,168,76,0.45)",
+                border: "1.5px solid rgba(34,111,84,0.45)",
                 boxShadow: "0 8px 28px rgba(4,12,26,0.36), inset 0 1px 0 rgba(255,255,255,0.18)",
               } : {
                 background: "linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",

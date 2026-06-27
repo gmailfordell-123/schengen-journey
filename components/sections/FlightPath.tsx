@@ -74,7 +74,7 @@ export function FlightPath() {
       style={{
         backgroundColor: "var(--navy-950)",
         backgroundImage:
-          "radial-gradient(900px 460px at 50% -20%, rgba(41,82,179,0.20), transparent 60%), linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%)",
+          "radial-gradient(900px 460px at 50% -20%, rgba(34,111,84,0.20), transparent 60%), linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%)",
       }}
     >
       <Container className="relative">
@@ -83,7 +83,6 @@ export function FlightPath() {
           eyebrow="Your Schengen Journey"
           title="From the UK & Ireland to all of Europe"
           subtitle="Once your appointment and documents are sorted, the only thing left is the journey itself — across all 27 Schengen states."
-          data-aos="fade-up"
         />
 
         {/* Flight path canvas */}
@@ -97,20 +96,20 @@ export function FlightPath() {
           >
             <defs>
               <linearGradient id="fp-route" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="var(--navy-400)" />
-                <stop offset="50%" stopColor="var(--gold-500)" />
-                <stop offset="100%" stopColor="var(--navy-400)" />
+                <stop offset="0%" stopColor="var(--navy-500)" />
+                <stop offset="50%" stopColor="var(--navy-400)" />
+                <stop offset="100%" stopColor="var(--navy-500)" />
               </linearGradient>
 
               <linearGradient id="fp-trail" x1="1" y1="0" x2="0" y2="0">
-                <stop offset="0%" stopColor="var(--gold-400)" stopOpacity="0.85" />
-                <stop offset="55%" stopColor="var(--gold-500)" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="var(--gold-500)" stopOpacity="0" />
+                <stop offset="0%" stopColor="#3aab80" stopOpacity="0.85" />
+                <stop offset="55%" stopColor="#226F54" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#226F54" stopOpacity="0" />
               </linearGradient>
 
               <radialGradient id="fp-glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="var(--gold-400)" stopOpacity="0.55" />
-                <stop offset="100%" stopColor="var(--gold-400)" stopOpacity="0" />
+                <stop offset="0%" stopColor="#3aab80" stopOpacity="0.55" />
+                <stop offset="100%" stopColor="#226F54" stopOpacity="0" />
               </radialGradient>
 
               <filter id="fp-blur" x="-50%" y="-50%" width="200%" height="200%">
@@ -144,8 +143,8 @@ export function FlightPath() {
 
             {/* Origin marker (UK / Ireland) */}
             <g>
-              <circle cx="96" cy="232" r="11" fill="var(--navy-800)" stroke="var(--gold-500)" strokeWidth="2" />
-              <circle cx="96" cy="232" r="3.5" fill="var(--gold-500)" />
+              <circle cx="96" cy="232" r="11" fill="var(--navy-800)" stroke="#226F54" strokeWidth="2" />
+              <circle cx="96" cy="232" r="3.5" fill="#226F54" />
               <text x="96" y="272" textAnchor="middle" fill="rgba(240,244,255,0.7)" fontSize="15" fontWeight="600" fontFamily="var(--app-sans)">
                 UK &amp; Ireland
               </text>
@@ -153,8 +152,8 @@ export function FlightPath() {
 
             {/* Destination marker (Schengen) */}
             <g>
-              <circle cx="1104" cy="214" r="11" fill="var(--navy-800)" stroke="var(--gold-500)" strokeWidth="2" />
-              <circle cx="1104" cy="214" r="3.5" fill="var(--gold-500)" />
+              <circle cx="1104" cy="214" r="11" fill="var(--navy-800)" stroke="#226F54" strokeWidth="2" />
+              <circle cx="1104" cy="214" r="3.5" fill="#226F54" />
               <text x="1104" y="254" textAnchor="middle" fill="rgba(240,244,255,0.7)" fontSize="15" fontWeight="600" fontFamily="var(--app-sans)">
                 Schengen Area
               </text>
@@ -172,7 +171,7 @@ export function FlightPath() {
               <g transform="rotate(45) scale(1.55)">
                 <g transform="translate(-12,-12)">
                   <path d={PLANE_PATH} fill="#ffffff" />
-                  <path d={PLANE_PATH} fill="none" stroke="var(--gold-400)" strokeWidth="0.6" />
+                  <path d={PLANE_PATH} fill="none" stroke="#3aab80" strokeWidth="0.6" />
                 </g>
               </g>
             </g>

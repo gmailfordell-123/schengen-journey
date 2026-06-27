@@ -28,12 +28,12 @@ const SERVICE_ICONS: Record<
 };
 
 const TAG_COLORS: Record<string, { bg: string; text: string }> = {
-  Appointments: { bg: "rgba(30,58,138,0.08)",  text: "var(--navy-700)" },
-  Documentation:{ bg: "rgba(30,58,138,0.08)",  text: "var(--navy-700)" },
-  Insurance:    { bg: "rgba(14,100,60,0.08)",  text: "#0a6640"          },
-  Reservations: { bg: "rgba(120,60,0,0.07)",   text: "#7c4400"          },
-  Tracking:     { bg: "rgba(30,58,138,0.08)",  text: "var(--navy-700)" },
-  Support:      { bg: "rgba(120,0,100,0.07)",  text: "#7a0060"          },
+  Appointments: { bg: "rgba(34,111,84,0.10)",  text: "var(--navy-600)" },
+  Documentation:{ bg: "rgba(34,111,84,0.10)",  text: "var(--navy-600)" },
+  Insurance:    { bg: "rgba(34,111,84,0.10)",  text: "var(--navy-600)" },
+  Reservations: { bg: "rgba(34,111,84,0.10)",  text: "var(--navy-600)" },
+  Tracking:     { bg: "rgba(34,111,84,0.10)",  text: "var(--navy-600)" },
+  Support:      { bg: "rgba(34,111,84,0.10)",  text: "var(--navy-600)" },
 };
 
 export function Services() {
@@ -65,7 +65,7 @@ export function Services() {
                 <div
                   className="overflow-hidden rounded-xl bg-white transition-all duration-200"
                   style={{
-                    border: `1px solid ${isOpen ? "rgba(30,58,138,0.28)" : "rgba(0,0,0,0.07)"}`,
+                    border: `1px solid ${isOpen ? "rgba(34,111,84,0.35)" : "rgba(0,0,0,0.07)"}`,
                     boxShadow: isOpen
                       ? "0 10px 30px rgba(4,12,26,0.10)"
                       : "0 1px 3px rgba(4,12,26,0.05)",

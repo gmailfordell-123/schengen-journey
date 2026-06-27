@@ -66,9 +66,9 @@ export default function ContactPage() {
                 >
                   <span
                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                    style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.25)" }}
+                    style={{ background: "rgba(34,111,84,0.15)", border: "1px solid rgba(34,111,84,0.25)" }}
                   >
-                    <card.Icon size={18} style={{ color: "var(--gold-500)" }} />
+                    <card.Icon size={18} style={{ color: "#3aab80" }} />
                   </span>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-0.5" style={{ color: "rgba(240,244,255,0.40)" }}>
